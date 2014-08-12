@@ -3,37 +3,14 @@
 
 require.config({
     paths: {
-        knockout: '/Scripts/knockout-3.1.0',
-        knockoutMapper: 'knockout.mapping-latest.debug',
-        jquery: '/Scripts/jquery-2.1.1'
+        knockout: '/Scripts/knockout-3.1.0'
     }
 });
 
-require(['jquery', 'src/html5Upload', 'domReady', 'knockout-models'], function (jquery, html5Upload, domReady, models) {
+require(['src/html5Upload', 'domReady', 'knockout-models'], function (html5Upload, domReady, models) {
     'use strict';
 
     domReady(function () {
-        $.getJSON("File/GetContainerBlobs",
-            { containerName: "newsarticleimages" },
-            function (data, textStatus, jqXHR) {
-                var vm = new models.GetContainerBlobsViewModel(data);
-
-                var context2 = document.getElementById('blobList');
-                models.applyBindings(vm, context2);
-            }
-        );
-
-
-
-
-
-
-
-
-
-
-
-
         if (html5Upload.fileApiSupported()) {
 
             var context = document.getElementById('upload-liveuploads'),

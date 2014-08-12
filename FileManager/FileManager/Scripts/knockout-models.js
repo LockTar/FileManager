@@ -1,7 +1,7 @@
 ﻿/*jslint browser:true*/
 /*global define*/
 
-define(['knockout'], function (ko) {
+define(['knockout', 'knockoutMapper'], function (ko, koMap) {
     'use strict';
 
     function trimTrailingZeros(number) {
@@ -29,6 +29,11 @@ define(['knockout'], function (ko) {
     }
 
     return {
+        GetContainerBlobsViewModel: function (data) {
+            var self = this;
+            return koMap.fromJS(data);
+        },
+
         UploadsViewModel: function () {
             this.uploads = ko.observableArray([]);
             this.showTotalProgress = ko.observable();

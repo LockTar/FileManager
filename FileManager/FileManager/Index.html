@@ -32,6 +32,44 @@
             <!--<script type="text/javascript" src="https://gist.github.com/4028759.js"></script>-->
         </div>
 
+        <div class="table-responsive" id="blobList">
+            <table class="table">
+                <!--table-striped">-->
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Filename</th>
+                        <th>Filetype</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: Blobs">
+                    <!--<tr data-bind="visible: IsDirectory">
+                        <td></td>
+                        <td colspan="3"></td>
+                    </tr>-->
+                    <tr>
+                        <td><a href="#">Edit</a></td>
+                        <td data-bind="text: Name"></td>
+                        <td data-bind="text: Uri"></td>
+                        <td style="text-align: right;"><a href="#">Delete</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
         <script type="text/html" id="template-uploads">
             <div data-bind="visible: showTotalProgress()">
                 <div>
@@ -55,7 +93,7 @@
                 </div>
             </div>
         </script>
-        
+
         <script type="text/javascript" data-main="/Scripts/main" src="Scripts/require.js"></script>
     </div>
 </body>

@@ -39,7 +39,7 @@ namespace FileManager.Controllers
 			return View(containers);
 		}
 
-		public JsonResult GetContainerBlobs(string containerName = "newsarticleimages", string prefix = null)
+		public JsonResult GetContainerBlobs(string containerName, string prefix = null)
 		{
 			if (string.IsNullOrWhiteSpace(containerName))
 			{
@@ -67,10 +67,10 @@ namespace FileManager.Controllers
 			//ViewBag.ContainerName = containerName;
 			//ViewBag.Prefix = prefix;
 
-			IEnumerable<IListBlobItem> containerListBlobs = container.ListBlobs(prefix, false);
+			vm.Blobs.AddRange(container.ListBlobs(prefix, false));
 
 			// Loop over items within the container and output the length and URI.
-			foreach (IListBlobItem item in containerListBlobs)
+			foreach (IListBlobItem item in vm.Blobs)
 			{
 				if (item.GetType() == typeof(CloudBlockBlob))
 				{
