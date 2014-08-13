@@ -43,18 +43,25 @@
                         <th></th>
                     </tr>
                 </thead>
-                <tbody data-bind="foreach: Blobs">
-                    <!--<tr data-bind="visible: IsDirectory">
-                        <td></td>
-                        <td colspan="3"></td>
-                    </tr>-->
-                    <tr>
-                        <td><a href="#">Edit</a></td>
-                        <td data-bind="text: Name"></td>
-                        <td data-bind="text: Uri"></td>
-                        <td style="text-align: right;"><a href="#">Delete</a></td>
-                    </tr>
-                </tbody>
+				<tbody data-bind="foreach: Blobs">
+
+					<!-- ko if: BlobType == 0 -->
+					<tr>
+						<td data-bind="text: Name"></td>
+						<td colspan="3"></td>
+					</tr>
+					<!-- /ko -->
+
+					<!-- ko if: BlobType == 1 -->
+					<tr>
+						<td><a href="#">Edit</a></td>
+						<td data-bind="text: Name"></td>
+						<td data-bind="text: Uri"></td>
+						<td style="text-align: right;"><a href="#">Delete</a></td>
+					</tr>
+					<!-- /ko -->
+
+				</tbody>
             </table>
         </div>
 

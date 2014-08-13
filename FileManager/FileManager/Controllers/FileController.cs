@@ -16,11 +16,53 @@ namespace FileManager.Controllers
 {
 	public class FileController : Controller
 	{
-		
+
+		public enum BlobItemType
+		{
+			CloudBlockBlob = 0,
+			CloudBlobDirectory = 1
+		}
+
 		private const string defaultContainerName = "New folder";
-		
+
 		public ActionResult Upload(HttpPostedFileBase file)
 		{
+			string containerName = "newsarticleimages";
+			string prefix = "";
+			string subdirectory = "SubDirectory";
+
+			if (string.IsNullOrWhiteSpace(containerName))
+			{
+				throw new ArgumentNullException("containerName", "Cannot upload file without container");
+			}
+
+			if (file == null)
+			{
+				throw new ArgumentNullException("file", "No file uploaded");
+			}
+
+			CloudStorageAccount storageAccount = GetStorageAccount();
+			CloudBlobClient blobClient = GetBlobClient(storageAccount);
+			CloudBlobContainer container = GetContainer(blobClient, containerName);
+
+			string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+			if (!ValidateFileName(fileName))
+			{
+				throw new ArgumentException("Incorrect filename", fileName);
+			}
+			string fileNameSaved = fileName.ToLower();
+			if (!string.IsNullOrWhiteSpace(subdirectory))
+			{
+				subdirectory = subdirectory.Trim().ToLower() + "/";
+			}
+			fileNameSaved = prefix + subdirectory + fileNameSaved + Path.GetExtension(file.FileName);
+
+			// Retrieve reference to a blob named "fotoRalph".
+			CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileNameSaved);
+
+			// Create or overwrite the "fotoRalph" blob with contents from a local file.
+			blockBlob.UploadFromStream(file.InputStream);
+
 			return Json(new
 			{
 				Success = true,
@@ -64,18 +106,23 @@ namespace FileManager.Controllers
 			{
 				vm.IsPrivateContainer = false;
 			}
-			//ViewBag.ContainerName = containerName;
-			//ViewBag.Prefix = prefix;
 
-			vm.Blobs.AddRange(container.ListBlobs(prefix, false));
+			vm.AllBlobs.AddRange(container.ListBlobs(prefix, false));
 
 			// Loop over items within the container and output the length and URI.
-			foreach (IListBlobItem item in vm.Blobs)
+			foreach (IListBlobItem item in vm.AllBlobs)
 			{
 				if (item.GetType() == typeof(CloudBlockBlob))
 				{
 					CloudBlockBlob blob = (CloudBlockBlob)item;
 					Console.WriteLine("Block blob of length {0}: {1}", blob.Properties.Length, blob.Uri);
+
+					vm.Blobs.Add(new BlobItemViewModel()
+					{
+						BlobType = BlobItemType.CloudBlockBlob,
+						Name = blob.Name,
+						Uri = blob.Uri.AbsoluteUri
+					});
 				}
 				else if (item.GetType() == typeof(CloudPageBlob))
 				{
@@ -86,6 +133,23 @@ namespace FileManager.Controllers
 				{
 					CloudBlobDirectory directory = (CloudBlobDirectory)item;
 					Console.WriteLine("Directory: {0}", directory.Uri);
+
+					var prefixSegments = directory.Prefix.Split(new char[] { '/' });
+					string prefixLast;
+					if (prefixSegments.Length > 1)
+						prefixLast = prefixSegments[prefixSegments.Length - 1];
+					else
+						prefixLast = string.Empty;
+
+					vm.Blobs.Add(new BlobItemViewModel()
+					{
+						BlobType = BlobItemType.CloudBlobDirectory,
+						Name = directory.Uri.Segments.Last().Replace("/", ""),
+						Uri = directory.Uri.AbsoluteUri,
+						PrefixFull = directory.Prefix,
+						PrefixLast = prefixLast
+					});
+
 				}
 			}
 
@@ -264,9 +328,34 @@ namespace FileManager.Controllers
 	public class GetContainerBlobsViewModel
 	{
 
-		private readonly List<IListBlobItem> blobs = new List<IListBlobItem>();
+		private readonly List<IListBlobItem> allBlobs = new List<IListBlobItem>();
+		private readonly List<BlobItemViewModel> blobs = new List<BlobItemViewModel>();
 
-		public List<IListBlobItem> Blobs
+		public List<CloudBlockBlob> BlockBlobs
+		{
+			get
+			{
+				return allBlobs.Where(b => b.GetType() == typeof(CloudBlockBlob)).Cast<CloudBlockBlob>().ToList();
+			}
+		}
+
+		public List<CloudBlobDirectory> DirectoryBlobs
+		{
+			get
+			{
+				return allBlobs.Where(b => b.GetType() == typeof(CloudBlobDirectory)).Cast<CloudBlobDirectory>().ToList();
+			}
+		}
+
+		public List<IListBlobItem> AllBlobs
+		{
+			get
+			{
+				return allBlobs;
+			}
+		}
+
+		public List<BlobItemViewModel> Blobs
 		{
 			get
 			{
@@ -274,18 +363,47 @@ namespace FileManager.Controllers
 			}
 		}
 
-		public int CountBlobs
-		{
-			get
-			{
-				return blobs.Count;
-			}
-		}
-
 		public string CurrentContainerName { get; set; }
 
 		public bool IsPrivateContainer { get; set; }
 
+	}
+
+	public class BlobItemViewModel
+	{
+
+		public FileController.BlobItemType BlobType { get; set; }
+
+		public string Name { get; set; }
+
+		public string Uri { get; set; }
+
+		public string PrefixLast { get; set; }
+
+		public string PrefixFull { get; set; }
+
+		public string Extension
+		{
+			get
+			{
+				return Path.GetExtension(Uri);
+			}
+		}
+
+		public string FileType
+		{
+			get
+			{
+				if (Extension == ".jpg" || Extension == ".png" || Extension == ".gif")
+				{
+					return "Afbeelding";
+				}
+				else
+				{
+					return string.Empty;
+				}
+			}
+		}
 	}
 
 	public class CreateContainerViewModel
