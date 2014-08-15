@@ -3,7 +3,7 @@
 
 require.config({
     paths: {
-        knockout: '/Scripts/knockout-3.1.0',
+        knockout: '/Scripts/knockout-3.1.0.debug',
         knockoutMapper: 'knockout.mapping-latest.debug',
         jquery: '/Scripts/jquery-2.1.1'
     }

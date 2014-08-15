@@ -149,9 +149,10 @@ namespace FileManager.Controllers
 						PrefixFull = directory.Prefix,
 						PrefixLast = prefixLast
 					});
-
 				}
 			}
+
+			//vm.Blobs = vm.Blobs.OrderBy(b => b.IsDirectory == false).ToList();
 
 			return Json(vm, JsonRequestBehavior.AllowGet);
 		}
@@ -329,7 +330,7 @@ namespace FileManager.Controllers
 	{
 
 		private readonly List<IListBlobItem> allBlobs = new List<IListBlobItem>();
-		private readonly List<BlobItemViewModel> blobs = new List<BlobItemViewModel>();
+		private List<BlobItemViewModel> blobs = new List<BlobItemViewModel>();
 
 		public List<CloudBlockBlob> BlockBlobs
 		{
@@ -360,6 +361,14 @@ namespace FileManager.Controllers
 			get
 			{
 				return blobs;
+			}
+		}
+
+		public List<BlobItemViewModel> BlobsOrderd
+		{
+			get
+			{
+				return blobs.OrderBy(b => b.IsDirectory == false).ToList();
 			}
 		}
 
@@ -402,6 +411,22 @@ namespace FileManager.Controllers
 				{
 					return string.Empty;
 				}
+			}
+		}
+
+		public bool IsDirectory
+		{
+			get
+			{
+				return BlobType == FileController.BlobItemType.CloudBlobDirectory;
+			}
+		}
+
+		public bool IsFile
+		{
+			get
+			{
+				return BlobType == FileController.BlobItemType.CloudBlockBlob;
 			}
 		}
 	}

@@ -20,18 +20,7 @@
         </div>
 
         <div id="upload-liveuploads" data-bind="template: { name: 'template-uploads' }"></div>
-
-        <div class="description">
-            <h2>RequireJS, Knockout and Uploader Harmony</h2>
-            <p>
-                Scripts are loaded using module loader <a href="http://requirejs.org/">RequireJS</a>. This demo
-                demonstrates how to use <a href="https://github.com/LockTar/FileManager">FileManager</a> and <a href="http://knockoutjs.com/">knockout</a> to customize UI for uploads.
-            </p>
-
-            <h2>Show me the code</h2>
-            <!--<script type="text/javascript" src="https://gist.github.com/4028759.js"></script>-->
-        </div>
-
+		
         <div class="table-responsive" id="blobList">
             <table class="table">
                 <!--table-striped">-->
@@ -43,16 +32,16 @@
                         <th></th>
                     </tr>
                 </thead>
-				<tbody data-bind="foreach: Blobs">
+				<tbody data-bind="foreach: BlobsOrderd">
 
-					<!-- ko if: BlobType == 0 -->
-					<tr>
+					<!-- ko if: IsDirectory -->
+					<tr data-bind="click: $parent.navigateToDirectory">
+						<td></td>
 						<td data-bind="text: Name"></td>
-						<td colspan="3"></td>
+						<td colspan="2"></td>
 					</tr>
 					<!-- /ko -->
-
-					<!-- ko if: BlobType == 1 -->
+					<!-- ko if: IsFile -->
 					<tr>
 						<td><a href="#">Edit</a></td>
 						<td data-bind="text: Name"></td>
