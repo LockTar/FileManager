@@ -13,24 +13,9 @@ require(['jquery', 'src/html5Upload', 'domReady', 'knockout-models'], function (
     'use strict';
 
     domReady(function () {
-        $.getJSON("File/GetContainerBlobs",
-            { containerName: "newsarticleimages" },
-            function (data, textStatus, jqXHR) {
-                var vm = new models.GetContainerBlobsViewModel(data);
-
-                var context2 = document.getElementById('blobList');
-                models.applyBindings(vm, context2);
-            }
-        );
 
 
-
-
-
-
-
-
-
+        models.GetContainerBlobs("newsarticleimages");
 
 
 

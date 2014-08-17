@@ -108,6 +108,7 @@ namespace FileManager.Controllers
 			}
 
 			vm.AllBlobs.AddRange(container.ListBlobs(prefix, false));
+			var blobs = new List<BlobItemViewModel>();
 
 			// Loop over items within the container and output the length and URI.
 			foreach (IListBlobItem item in vm.AllBlobs)
@@ -117,11 +118,47 @@ namespace FileManager.Controllers
 					CloudBlockBlob blob = (CloudBlockBlob)item;
 					Console.WriteLine("Block blob of length {0}: {1}", blob.Properties.Length, blob.Uri);
 
-					vm.Blobs.Add(new BlobItemViewModel()
+					// Get the name and prefix of the blob
+					var nameSegments = blob.Name.Split(new char[] { '/' });
+					string name;
+					string prefixFull = string.Empty;
+					string prefixLast;
+					if (nameSegments.Length > 1)
+					{
+						// Get the name
+						name = nameSegments[nameSegments.Length - 1];
+
+						// Get the prefix of the blob
+						prefixLast = nameSegments[nameSegments.Length - 2];
+
+						// Get the full prefix
+						for (int i = 0; i < nameSegments.Length - 1; i++)
+						{
+							if (string.IsNullOrWhiteSpace(prefixFull))
+							{
+								prefixFull = nameSegments[i] + "/";
+							}
+							else
+							{
+								prefixFull = string.Format("{0}{1}/", prefixFull, nameSegments[i]);
+							}
+						}
+					}
+					else
+					{
+						name = nameSegments[nameSegments.Length - 1];
+						prefixFull = string.Empty;
+						prefixLast = string.Empty;
+					}
+
+
+					blobs.Add(new BlobItemViewModel()
 					{
 						BlobType = BlobItemType.CloudBlockBlob,
-						Name = blob.Name,
-						Uri = blob.Uri.AbsoluteUri
+						Name = name,
+						Uri = blob.Uri.AbsoluteUri,
+						PrefixFull = prefixFull,
+						PrefixLast = prefixLast
 					});
 				}
 				else if (item.GetType() == typeof(CloudPageBlob))
@@ -141,7 +178,7 @@ namespace FileManager.Controllers
 					else
 						prefixLast = string.Empty;
 
-					vm.Blobs.Add(new BlobItemViewModel()
+					blobs.Add(new BlobItemViewModel()
 					{
 						BlobType = BlobItemType.CloudBlobDirectory,
 						Name = directory.Uri.Segments.Last().Replace("/", ""),
@@ -152,7 +189,9 @@ namespace FileManager.Controllers
 				}
 			}
 
-			//vm.Blobs = vm.Blobs.OrderBy(b => b.IsDirectory == false).ToList();
+			// Order the blobs and add them to the viewmodel
+			blobs = blobs.OrderBy(b => b.IsDirectory == false).ToList();
+			vm.Blobs.AddRange(blobs);
 
 			return Json(vm, JsonRequestBehavior.AllowGet);
 		}
@@ -268,7 +307,7 @@ namespace FileManager.Controllers
 		}
 
 		[HttpPost]
-		public ActionResult DeleteFile(string containerName, string fileName, string prefix = null)
+		public void DeleteFile(string containerName, string fileName, string prefix = null)
 		{
 			if (string.IsNullOrWhiteSpace(containerName))
 			{
@@ -285,12 +324,10 @@ namespace FileManager.Controllers
 			CloudBlobContainer container = GetContainer(blobClient, containerName);
 
 			// Retrieve reference to a blob named "myblob.txt".
-			var blob = container.GetBlobReferenceFromServer(fileName);
+			var blob = container.GetBlobReferenceFromServer(prefix + fileName);
 
 			// Delete the blob.
 			blob.Delete();
-
-			return RedirectToAction("ContainerBlobs", new { containerName = containerName, prefix = prefix });
 		}
 
 		#region Private Methods
@@ -330,7 +367,7 @@ namespace FileManager.Controllers
 	{
 
 		private readonly List<IListBlobItem> allBlobs = new List<IListBlobItem>();
-		private List<BlobItemViewModel> blobs = new List<BlobItemViewModel>();
+		private readonly List<BlobItemViewModel> blobs = new List<BlobItemViewModel>();
 
 		public List<CloudBlockBlob> BlockBlobs
 		{
@@ -361,14 +398,6 @@ namespace FileManager.Controllers
 			get
 			{
 				return blobs;
-			}
-		}
-
-		public List<BlobItemViewModel> BlobsOrderd
-		{
-			get
-			{
-				return blobs.OrderBy(b => b.IsDirectory == false).ToList();
 			}
 		}
 

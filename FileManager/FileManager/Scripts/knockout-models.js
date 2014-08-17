@@ -2,115 +2,113 @@
 /*global define*/
 
 define(['knockout', 'knockoutMapper'], function (ko, koMap) {
-	'use strict';
+    'use strict';
 
-	function trimTrailingZeros(number) {
-		return number.toFixed(1).replace(/\.0+$/, '');
-	}
+    function trimTrailingZeros(number) {
+        return number.toFixed(1).replace(/\.0+$/, '');
+    }
 
-	function formatFileSize(sizeInBytes) {
-		var kiloByte = 1024,
+    function formatFileSize(sizeInBytes) {
+        var kiloByte = 1024,
             megaByte = Math.pow(kiloByte, 2),
             gigaByte = Math.pow(kiloByte, 3);
 
-		if (sizeInBytes < kiloByte) {
-			return sizeInBytes + ' B';
-		}
+        if (sizeInBytes < kiloByte) {
+            return sizeInBytes + ' B';
+        }
 
-		if (sizeInBytes < megaByte) {
-			return trimTrailingZeros(sizeInBytes / kiloByte) + ' kB';
-		}
+        if (sizeInBytes < megaByte) {
+            return trimTrailingZeros(sizeInBytes / kiloByte) + ' kB';
+        }
 
-		if (sizeInBytes < gigaByte) {
-			return trimTrailingZeros(sizeInBytes / megaByte) + ' MB';
-		}
+        if (sizeInBytes < gigaByte) {
+            return trimTrailingZeros(sizeInBytes / megaByte) + ' MB';
+        }
 
-		return trimTrailingZeros(sizeInBytes / gigaByte) + ' GB';
-	}
+        return trimTrailingZeros(sizeInBytes / gigaByte) + ' GB';
+    }
 
-	function BlobItemViewModel(data, container) {
-		var self = this;
-		self.Container = container;
+    function ContainerBlobsViewModel(data, containerName) {
+        var self = this;
+        self.ContainerName = containerName;
 
-		koMap.fromJS(data, {}, self);
+        self.Mapping = {
+            //'observe': [], // Covert the properties to non observable properties
+            'Blobs': {
+                create: function (options) {
+                    return new BlobItemViewModel(options.data, self);
+                }
+            }
+        };
 
+        koMap.fromJS(data, self.Mapping, self);
 
-	}
+        self.navigateToDirectory = function (directory) {
+            // Get content of the selected directory
+            var prefix;
+            if (directory) {
+                prefix = directory.PrefixFull();
+            }
 
-	return {
+            $.getJSON("File/GetContainerBlobs",
+                { containerName: self.ContainerName, prefix: prefix },
+                function (data, textStatus, jqXHR) {
+                    var vm = new ContainerBlobsViewModel(data, self.ContainerName);
 
-		GetContainerBlobsViewModel: function (data) {
-			var self = this;
+                    self.Blobs(vm.Blobs());
+                }
+            );
+        }
 
-			self.Mapping = {
-				//'observe': [], // Covert the properties to non observable properties
-				'Blobs': {
-					create: function (options) {
-						return new BlobItemViewModel(options.data, self);
-					}
-				}
-			};
+        self.DeleteFile = function (file) {
+            // Delete the selected file
+            $.post("File/DeleteFile", { containerName: self.ContainerName, fileName: file.Name, prefix: file.PrefixFull });
 
+            self.Blobs.remove(file);
+        }
+    }
 
-			koMap.fromJS(data, self.Mapping, self);
+    function BlobItemViewModel(data, container) {
+        var self = this;
+        self.Container = container;
 
-			self.navigateToDirectory = function (item) {
-				// Get content of the selected directory
-				$.getJSON("File/GetContainerBlobs",
-					{ containerName: "newsarticleimages", prefix: item.PrefixFull() },
-					function (data, textStatus, jqXHR) {
-						koMap.fromJS(data, self.Mapping, self);
-					}
-				);
-			}
-		},
+        koMap.fromJS(data, {}, self);
+    }
 
-		////GetContainerBlobsViewModel: function (data) {
-		////	var self = this;
+    return {
 
-		////	koMap.fromJS(data, {
-		////		ignore: ['Blobs']
-		////	}, self);
+        GetContainerBlobs: function (containerName) {
+            $.getJSON("File/GetContainerBlobs",
+                { containerName: containerName },
+                function (data, textStatus, jqXHR) {
+                    var vm = new ContainerBlobsViewModel(data, containerName);
 
-		////	self.Blobs = new ko.observableArray();
+                    var context2 = document.getElementById('blobList');
+                    ko.applyBindings(vm, context2);
+                }
+            );
+        },
 
-		////	self.navigateToDirectory = function (item) {
-		////		// Get content of the selected directory
-		////		var prefix = item ? item.PrefixFull() : null;
+        UploadsViewModel: function () {
+            this.uploads = ko.observableArray([]);
+            this.showTotalProgress = ko.observable();
+            this.uploadSpeedFormatted = ko.observable();
+            this.timeRemainingFormatted = ko.observable();
+            this.totalProgress = ko.observable();
+        },
 
-		////		$.getJSON("File/GetContainerBlobs",
-		////			{ containerName: "newsarticleimages", prefix: prefix },
-		////			function (data, textStatus, jqXHR) {
-		////				self.Blobs(data.Blobs.map(function (b) {
-		////					new BlobItemViewModel(b, self);
-		////				}));
-		////			}
-		////		);
-		////	}
+        FileViewModel: function (file) {
+            this.file = file;
+            this.uploadProgress = ko.observable(0);
+            this.uploadCompleted = ko.observable(false);
+            this.uploadSpeedFormatted = ko.observable();
+            this.fileName = file.fileName;
+            this.fileSizeFormated = formatFileSize(file.fileSize);
+        },
 
-		////	self.navigateToDirectory();
-		////},
-
-		UploadsViewModel: function () {
-			this.uploads = ko.observableArray([]);
-			this.showTotalProgress = ko.observable();
-			this.uploadSpeedFormatted = ko.observable();
-			this.timeRemainingFormatted = ko.observable();
-			this.totalProgress = ko.observable();
-		},
-
-		FileViewModel: function (file) {
-			this.file = file;
-			this.uploadProgress = ko.observable(0);
-			this.uploadCompleted = ko.observable(false);
-			this.uploadSpeedFormatted = ko.observable();
-			this.fileName = file.fileName;
-			this.fileSizeFormated = formatFileSize(file.fileSize);
-		},
-
-		applyBindings: function (model, context) {
-			ko.applyBindings(model, context);
-		}
-	};
+        applyBindings: function (model, context) {
+            ko.applyBindings(model, context);
+        }
+    };
 
 });
