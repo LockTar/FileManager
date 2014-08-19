@@ -5,11 +5,12 @@ require.config({
     paths: {
         knockout: '/Scripts/knockout-3.1.0.debug',
         knockoutMapper: 'knockout.mapping-latest.debug',
-        jquery: '/Scripts/jquery-2.1.1'
+        //jquery: '/Scripts/jquery-2.1.1'
+        //jquery: '//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'
     }
 });
 
-require(['jquery', 'src/html5Upload', 'domReady', 'knockout-models'], function (jquery, html5Upload, domReady, models) {
+require(['src/html5Upload', 'domReady', 'knockout-models'], function (html5Upload, domReady, models) {
     'use strict';
 
     domReady(function () {
