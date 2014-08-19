@@ -125,7 +125,11 @@
 								<td><a href="#">Edit</a></td>
 								<td data-bind="text: Name"></td>
 								<td data-bind="text: Uri"></td>
-								<td style="text-align: right;"><a href="#" data-bind="click: $parent.DeleteFile">Delete</a></td>
+								<td style="text-align: right;">
+									<button type="button" class="btn btn-danger btn-xs" data-bind="click: $parent.DeleteFile">
+										<span class="glyphicon glyphicon-trash"></span> Delete
+									</button>
+								</td>
 							</tr>
 							<!-- /ko -->
 
@@ -164,15 +168,39 @@
 			</div>
 		</div>
 	</script>
-
 	
-
 	<!-- Bootstrap core JavaScript
 	================================================== -->
 	<!-- Placed at the end of the document so the pages load faster -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 	<script src="Scripts/bootstrap.min.js"></script>
 	<script src="docs.min.js"></script>
+
+
+
+	<script>
+		var drop = document.getElementById("dragndropimage");
+		drop.addEventListener("dragover", change, false);
+		drop.addEventListener("dragleave", change_back, false);
+		
+		function toggleDrag() {
+			$(drop).toggleClass("uploadimage-dragndrop-hover");
+		}
+
+		function change() {
+			//drop.style.backgroundColor = '#EFF2AA';
+			//drop.style.border = '2px solid #DDD';
+
+			$(drop).addClass("uploadimage-dragndrop-hover");
+		};
+
+		function change_back() {
+			//drop.style.backgroundColor = 'transparent';
+			//drop.style.border = '2px dashed #DDD';
+
+			$(drop).removeClass("uploadimage-dragndrop-hover");
+		};
+	</script>
 
 
 

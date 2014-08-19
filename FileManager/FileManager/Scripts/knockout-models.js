@@ -61,10 +61,19 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
         }
 
         self.DeleteFile = function (file) {
-            // Delete the selected file
-            $.post("File/DeleteFile", { containerName: self.ContainerName, fileName: file.Name, prefix: file.PrefixFull });
+        	console.log('Delete file in Container: ' + self.ContainerName + ' File: ' + file.Name() + ' Prefix: ' + file.PrefixFull());
 
-            self.Blobs.remove(file);
+            // Delete the selected file
+        	$.post("File/DeleteFile",
+				{
+					containerName: self.ContainerName,
+					fileName: file.Name(),
+					prefix: file.PrefixFull()
+				},
+				function () {
+					self.Blobs.remove(file);
+				}
+			);
         }
     }
 
