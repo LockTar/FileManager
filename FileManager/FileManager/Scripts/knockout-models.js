@@ -61,17 +61,17 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
         }
 
         self.DeleteFile = function (file) {
-        	console.log('Delete file in Container: ' + self.ContainerName + ' File: ' + file.Name() + ' Prefix: ' + file.PrefixFull());
+            console.log('Delete file in Container: ' + self.ContainerName + ' File: ' + file.Name() + ' Prefix: ' + file.PrefixFull());
 
             // Delete the selected file
-        	$.post("File/DeleteFile",
+            $.post("File/DeleteFile",
 				{
-					containerName: self.ContainerName,
-					fileName: file.Name(),
-					prefix: file.PrefixFull()
+				    containerName: self.ContainerName,
+				    fileName: file.Name(),
+				    prefix: file.PrefixFull()
 				},
 				function () {
-					self.Blobs.remove(file);
+				    self.Blobs.remove(file);
 				}
 			);
         }
@@ -84,7 +84,18 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
         koMap.fromJS(data, {}, self);
     }
 
+    function UploadsViewModel() {
+        //var self = this;
+
+        this.uploads = ko.observableArray([]);
+        this.showTotalProgress = ko.observable();
+        this.uploadSpeedFormatted = ko.observable();
+        this.timeRemainingFormatted = ko.observable();
+        this.totalProgress = ko.observable();
+    }
+
     return {
+
 
         GetContainerBlobs: function (containerName) {
             $.getJSON("File/GetContainerBlobs",
@@ -114,6 +125,40 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
             this.fileName = file.fileName;
             this.fileSizeFormated = formatFileSize(file.fileSize);
         },
+
+
+
+        PageViewModel: function (containerName) {
+            ////this.containersViewModel = GetContainerBlobs(containerName);
+            ////this.uploadsViewModel = new this.UploadsViewModel();
+
+            ////var vm = {
+            ////    containersViewModel: new this.GetContainerBlobs(containerName),
+            ////    uploadsViewModel: new this.UploadsViewModel()
+            ////};
+            var self = this;
+            self.containersViewModel = ko.observable();
+
+            $.getJSON("File/GetContainerBlobs",
+                { containerName: containerName },
+                function (data, textStatus, jqXHR) {
+                    var vm = new ContainerBlobsViewModel(data, containerName);
+                    self.containersViewModel(vm);
+                }
+            );
+
+            //this.uploadsViewModel = {
+            //    uploads: ko.observableArray([]),
+            //    showTotalProgress: ko.observable(),
+            //    uploadSpeedFormatted: ko.observable(),
+            //    timeRemainingFormatted: ko.observable(),
+            //    totalProgress: ko.observable()
+            //}
+
+            self.uploadsViewModel = new UploadsViewModel();
+        },
+
+
 
         applyBindings: function (model, context) {
             ko.applyBindings(model, context);

@@ -79,24 +79,24 @@
 				</ul>
 			</div>-->
 			<!--<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">-->
-			<div class="col-sm-12 col-sm-offset-0 col-md-12 col-md-offset-0 main">
+			<div id="page-viewmodel" class="col-sm-12 col-sm-offset-0 col-md-12 col-md-offset-0 main">
 				<h1 class="page-header">FileMan</h1>
 				<h2 class="page-header">Upload file</h2>
 
 				<div class="row">
-					<div class="col-sm-12">
-						<div id="dragndropimage" class="uploadimage-dragndrop">
-							<div class="uploadimage-text">Drag images here</div>
-							<div>Or, if you prefer...</div>
-							<div class="uploadimage-input">
-								<div style="width:400px; margin:auto;">
-									<input type="file" multiple="multiple" name="uploadFiles" id="upload-input" style="width:400px;" />
-								</div>
-							</div>
-						</div>
+                    <div class="col-sm-12">  <!--data-bind="with: uploadsViewModel"-->
+                        <div id="dragndropimage" class="uploadimage-dragndrop">
+                            <div class="uploadimage-text">Drag images here</div>
+                            <div>Or, if you prefer...</div>
+                            <div class="uploadimage-input">
+                                <div style="width:400px; margin:auto;">
+                                    <input type="file" multiple="multiple" name="uploadFiles" id="upload-input" style="width:400px;" />
+                                </div>
+                            </div>
+                        </div>
 
-						<div id="upload-liveuploads" data-bind="template: { name: 'template-uploads' }"></div>
-					</div>
+                        <div id="upload-liveuploads" data-bind="template: { name: 'template-uploads' }"></div>
+                    </div>
 				</div>
 
 				<h2 class="sub-header">Browse files</h2>
@@ -111,29 +111,29 @@
 								<th></th>
 							</tr>
 						</thead>
-						<tbody data-bind="foreach: Blobs">
+                        <tbody data-bind="foreach: containersViewModel.Blobs">
 
-							<!-- ko if: IsDirectory -->
-							<tr data-bind="click: $parent.navigateToDirectory">
-								<td></td>
-								<td data-bind="text: Name"></td>
-								<td colspan="2"></td>
-							</tr>
-							<!-- /ko -->
-							<!-- ko if: IsFile -->
-							<tr>
-								<td><a href="#">Edit</a></td>
-								<td data-bind="text: Name"></td>
-								<td data-bind="text: Uri"></td>
-								<td style="text-align: right;">
-									<button type="button" class="btn btn-danger btn-xs" data-bind="click: $parent.DeleteFile">
-										<span class="glyphicon glyphicon-trash"></span> Delete
-									</button>
-								</td>
-							</tr>
-							<!-- /ko -->
+                            <!-- ko if: IsDirectory -->
+                            <tr data-bind="click: $parent.navigateToDirectory">
+                                <td></td>
+                                <td data-bind="text: Name"></td>
+                                <td colspan="2"></td>
+                            </tr>
+                            <!-- /ko -->
+                            <!-- ko if: IsFile -->
+                            <tr>
+                                <td><a href="#">Edit</a></td>
+                                <td data-bind="text: Name"></td>
+                                <td data-bind="text: Uri"></td>
+                                <td style="text-align: right;">
+                                    <button type="button" class="btn btn-danger btn-xs" data-bind="click: $parent.DeleteFile">
+                                        <span class="glyphicon glyphicon-trash"></span> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- /ko -->
 
-						</tbody>
+                        </tbody>
 					</table>
 				</div>
 			</div>
@@ -146,27 +146,27 @@
 
 
 	<script type="text/html" id="template-uploads">
-		<div data-bind="visible: showTotalProgress()">
-			<div>
-				<span data-bind="text: uploadSpeedFormatted()"></span>
-				<span data-bind="text: timeRemainingFormatted()" style="float: right;"></span>
-			</div>
-			<div class="uploadimage-totalprogress">
-				<div class="uploadimage-totalprogressbar" style="width: 0%;" data-bind="style: { width: totalProgress() + '%' }"></div>
-			</div>
-		</div>
-		<div data-bind="foreach: uploads">
-			<div class="uploadimage-upload" data-bind="css: { 'uploadimage-uploadcompleted': uploadCompleted() }">
-				<div class="uploadimage-fileinfo">
-					<strong data-bind="text: fileName"></strong>
-					<span data-bind="text: fileSizeFormated"></span>
-					<span class="uploadimage-progresspct" data-bind="visible: uploadProgress() < 100"><span data-bind="text: uploadSpeedFormatted()"></span></span>
-				</div>
-				<div class="uploadimage-progress">
-					<div class="uploadimage-progressbar" style="width: 0%;" data-bind="style: { width: uploadProgress() + '%' }"></div>
-				</div>
-			</div>
-		</div>
+        <div data-bind="visible: uploadsViewModel.showTotalProgress()">
+            <div>
+                <span data-bind="text: uploadsViewModel.uploadSpeedFormatted()"></span>
+                <span data-bind="text: uploadsViewModel.timeRemainingFormatted()" style="float: right;"></span>
+            </div>
+            <div class="uploadimage-totalprogress">
+                <div class="uploadimage-totalprogressbar" style="width: 0%;" data-bind="style: { width: uploadsViewModel.totalProgress() + '%' }"></div>
+            </div>
+        </div>
+        <div data-bind="foreach: uploadsViewModel.uploads">
+            <div class="uploadimage-upload" data-bind="css: { 'uploadimage-uploadcompleted': uploadCompleted() }">
+                <div class="uploadimage-fileinfo">
+                    <strong data-bind="text: fileName"></strong>
+                    <span data-bind="text: fileSizeFormated"></span>
+                    <span class="uploadimage-progresspct" data-bind="visible: uploadProgress() < 100"><span data-bind="text: uploadSpeedFormatted()"></span></span>
+                </div>
+                <div class="uploadimage-progress">
+                    <div class="uploadimage-progressbar" style="width: 0%;" data-bind="style: { width: uploadProgress() + '%' }"></div>
+                </div>
+            </div>
+        </div>
 	</script>
 	
 	<!-- Bootstrap core JavaScript
