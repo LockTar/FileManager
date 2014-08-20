@@ -107,11 +107,11 @@ namespace FileManager.Controllers
 				vm.IsPrivateContainer = false;
 			}
 
-			vm.AllBlobs.AddRange(container.ListBlobs(prefix, false));
+			var allBlobs = container.ListBlobs(prefix, false);
 			var blobs = new List<BlobItemViewModel>();
 
 			// Loop over items within the container and output the length and URI.
-			foreach (IListBlobItem item in vm.AllBlobs)
+			foreach (IListBlobItem item in allBlobs)
 			{
 				if (item.GetType() == typeof(CloudBlockBlob))
 				{
@@ -366,32 +366,7 @@ namespace FileManager.Controllers
 	public class GetContainerBlobsViewModel
 	{
 
-		private readonly List<IListBlobItem> allBlobs = new List<IListBlobItem>();
 		private readonly List<BlobItemViewModel> blobs = new List<BlobItemViewModel>();
-
-		public List<CloudBlockBlob> BlockBlobs
-		{
-			get
-			{
-				return allBlobs.Where(b => b.GetType() == typeof(CloudBlockBlob)).Cast<CloudBlockBlob>().ToList();
-			}
-		}
-
-		public List<CloudBlobDirectory> DirectoryBlobs
-		{
-			get
-			{
-				return allBlobs.Where(b => b.GetType() == typeof(CloudBlobDirectory)).Cast<CloudBlobDirectory>().ToList();
-			}
-		}
-
-		public List<IListBlobItem> AllBlobs
-		{
-			get
-			{
-				return allBlobs;
-			}
-		}
 
 		public List<BlobItemViewModel> Blobs
 		{
