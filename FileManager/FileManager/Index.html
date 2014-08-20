@@ -100,9 +100,18 @@
 				</div>
 
 				<h2 class="sub-header">Browse files</h2>
-				<div class="table-responsive">
-					<table id="blobList" class="table table-hover" data-bind="with: containersViewModel">
-						<!--table-striped">-->
+
+				<div class="row" data-bind="with: containerViewModel">
+					<div class="col-md-2">
+						<button type="button" class="btn btn-default btn-sm" data-bind="click: ParentDirectory, enable: IsRootDirectory() == false ">
+							<span class="glyphicon glyphicon-arrow-up"></span> Parent folder
+						</button>
+					</div>
+					<div class="col-md-10" data-bind="text: BreadCrumb"></div>
+				</div>
+
+				<div class="table-responsive" data-bind="with: containerViewModel">
+					<table id="blobList" class="table table-hover">
 						<thead>
 							<tr>
 								<th></th>
@@ -122,10 +131,17 @@
 							<!-- /ko -->
 							<!-- ko if: IsFile -->
 							<tr>
-								<td><a href="#">Edit</a></td>
+								<td>
+									<button type="button" class="btn btn-default btn-xs" title="Download">
+										<span class="glyphicon glyphicon-download"></span>
+									</button>
+								</td>
 								<td data-bind="text: Name"></td>
 								<td data-bind="text: Uri"></td>
 								<td style="text-align: right;">
+									<button type="button" class="btn btn-warning btn-xs">
+										<span class="glyphicon glyphicon-pencil"></span> Edit
+									</button>
 									<button type="button" class="btn btn-danger btn-xs" data-bind="click: $parent.DeleteFile">
 										<span class="glyphicon glyphicon-trash"></span> Delete
 									</button>
@@ -142,29 +158,29 @@
 
 
 	<script type="text/html" id="template-uploads">
-        <div data-bind="visible: showTotalProgress()">
-            <div>
-                <span data-bind="text: uploadSpeedFormatted()"></span>
-                <span data-bind="text: timeRemainingFormatted()" style="float: right;"></span>
-            </div>
-            <div class="uploadimage-totalprogress">
-                <div class="uploadimage-totalprogressbar" style="width: 0%;" data-bind="style: { width: totalProgress() + '%' }"></div>
-            </div>
-        </div>
-        <div data-bind="foreach: uploads">
-            <div class="uploadimage-upload" data-bind="css: { 'uploadimage-uploadcompleted': uploadCompleted() }">
-                <div class="uploadimage-fileinfo">
-                    <strong data-bind="text: fileName"></strong>
-                    <span data-bind="text: fileSizeFormated"></span>
-                    <span class="uploadimage-progresspct" data-bind="visible: uploadProgress() < 100"><span data-bind="text: uploadSpeedFormatted()"></span></span>
-                </div>
-                <div class="uploadimage-progress">
-                    <div class="uploadimage-progressbar" style="width: 0%;" data-bind="style: { width: uploadProgress() + '%' }"></div>
-                </div>
-            </div>
-        </div>
+		<div data-bind="visible: showTotalProgress()">
+			<div>
+				<span data-bind="text: uploadSpeedFormatted()"></span>
+				<span data-bind="text: timeRemainingFormatted()" style="float: right;"></span>
+			</div>
+			<div class="uploadimage-totalprogress">
+				<div class="uploadimage-totalprogressbar" style="width: 0%;" data-bind="style: { width: totalProgress() + '%' }"></div>
+			</div>
+		</div>
+		<div data-bind="foreach: uploads">
+			<div class="uploadimage-upload" data-bind="css: { 'uploadimage-uploadcompleted': uploadCompleted() }">
+				<div class="uploadimage-fileinfo">
+					<strong data-bind="text: fileName"></strong>
+					<span data-bind="text: fileSizeFormated"></span>
+					<span class="uploadimage-progresspct" data-bind="visible: uploadProgress() < 100"><span data-bind="text: uploadSpeedFormatted()"></span></span>
+				</div>
+				<div class="uploadimage-progress">
+					<div class="uploadimage-progressbar" style="width: 0%;" data-bind="style: { width: uploadProgress() + '%' }"></div>
+				</div>
+			</div>
+		</div>
 	</script>
-	
+
 
 	<!-- Bootstrap core JavaScript
 	================================================== -->
@@ -179,7 +195,7 @@
 		var drop = document.getElementById("dragndropimage");
 		drop.addEventListener("dragover", change, false);
 		drop.addEventListener("dragleave", change_back, false);
-		
+
 		function change() {
 			$(drop).addClass("uploadimage-dragndrop-hover");
 		};
@@ -188,8 +204,9 @@
 			$(drop).removeClass("uploadimage-dragndrop-hover");
 		};
 	</script>
-	
+
 
 	<script type="text/javascript" data-main="/Scripts/main" src="Scripts/require.js"></script>
 </body>
+
 </html>

@@ -92,9 +92,10 @@ namespace FileManager.Controllers
 			CloudBlobClient blobClient = GetBlobClient(storageAccount);
 			CloudBlobContainer container = GetContainer(blobClient, containerName);
 
-			GetContainerBlobsViewModel vm = new GetContainerBlobsViewModel()
+			ContainerViewModel vm = new ContainerViewModel()
 			{
-				CurrentContainerName = containerName
+				ContainerName = containerName,
+				IsRootDirectory = string.IsNullOrWhiteSpace(prefix)
 			};
 
 			var permissions = container.GetPermissions();
@@ -119,43 +120,46 @@ namespace FileManager.Controllers
 					Console.WriteLine("Block blob of length {0}: {1}", blob.Properties.Length, blob.Uri);
 
 					// Get the name and prefix of the blob
-					var nameSegments = blob.Name.Split(new char[] { '/' });
-					string name;
-					string prefixFull = string.Empty;
-					string prefixLast;
-					if (nameSegments.Length > 1)
-					{
-						// Get the name
-						name = nameSegments[nameSegments.Length - 1];
+					var nameSegments = GetBlobNameSegments(blob.Name);
+					string blobName = GetBlobName(blob.Name);
+					string prefixFull = GetPrefixFull(blob.Name);
+					string prefixLast = GetPrefixLast(blob.Name);
 
-						// Get the prefix of the blob
-						prefixLast = nameSegments[nameSegments.Length - 2];
 
-						// Get the full prefix
-						for (int i = 0; i < nameSegments.Length - 1; i++)
-						{
-							if (string.IsNullOrWhiteSpace(prefixFull))
-							{
-								prefixFull = nameSegments[i] + "/";
-							}
-							else
-							{
-								prefixFull = string.Format("{0}{1}/", prefixFull, nameSegments[i]);
-							}
-						}
-					}
-					else
-					{
-						name = nameSegments[nameSegments.Length - 1];
-						prefixFull = string.Empty;
-						prefixLast = string.Empty;
-					}
+
+					//if (nameSegments.Length > 1)
+					//{
+					//	// Get the name
+					//	blobName = nameSegments[nameSegments.Length - 1];
+
+					//	// Get the prefix of the blob
+					//	prefixLast = nameSegments[nameSegments.Length - 2];
+
+					//	// Get the full prefix
+					//	for (int i = 0; i < nameSegments.Length - 1; i++)
+					//	{
+					//		if (string.IsNullOrWhiteSpace(prefixFull))
+					//		{
+					//			prefixFull = nameSegments[i] + "/";
+					//		}
+					//		else
+					//		{
+					//			prefixFull = string.Format("{0}{1}/", prefixFull, nameSegments[i]);
+					//		}
+					//	}
+					//}
+					//else
+					//{
+					//	blobName = nameSegments[nameSegments.Length - 1];
+					//	prefixFull = string.Empty;
+					//	prefixLast = string.Empty;
+					//}
 
 
 					blobs.Add(new BlobItemViewModel()
 					{
 						BlobType = BlobItemType.CloudBlockBlob,
-						Name = name,
+						Name = blobName,
 						Uri = blob.Uri.AbsoluteUri,
 						PrefixFull = prefixFull,
 						PrefixLast = prefixLast
@@ -339,6 +343,118 @@ namespace FileManager.Controllers
 			return blobClient;
 		}
 
+
+		private static string GetPrefixFull(string blobName)
+		{
+			var nameSegments = GetBlobNameSegments(blobName);
+			string prefixFull = string.Empty;
+
+			if (nameSegments.Length > 1)
+			{
+				// Get the full prefix
+				for (int i = 0; i < nameSegments.Length - 1; i++)
+				{
+					if (string.IsNullOrWhiteSpace(prefixFull))
+					{
+						prefixFull = nameSegments[i] + "/";
+					}
+					else
+					{
+						prefixFull = string.Format("{0}{1}/", prefixFull, nameSegments[i]);
+					}
+				}
+			}
+			else
+			{
+				prefixFull = string.Empty;
+			}
+
+			return prefixFull;
+		}
+
+		private static string GetPrefixLast(string blobName)
+		{
+			var nameSegments = GetBlobNameSegments(blobName);
+			string prefixLast = string.Empty;
+
+			if (nameSegments.Length > 1)
+			{
+				// Get the prefix of the blob
+				prefixLast = nameSegments[nameSegments.Length - 2];
+			}
+			else
+			{
+				prefixLast = string.Empty;
+			}
+
+			return prefixLast;
+		}
+
+		/// <summary>
+		/// Get the full prefix of the parent directory.
+		/// </summary>
+		/// <param name="prefixFull">A full prefix of a blob in the current directory.</param>
+		/// <returns>The full prefix of the parent directory otherwise empty string.</returns>
+		public static string GetPrefixFullParent(string prefixFull)
+		{
+			var nameSegments = GetBlobNameSegments(prefixFull);
+			string prefixParent = string.Empty;
+
+			if (nameSegments.Length > 1)
+			{
+				// Get the full prefix
+				for (int i = 0; i < nameSegments.Length - 2; i++)
+				{
+					if (string.IsNullOrWhiteSpace(prefixParent))
+					{
+						prefixParent = nameSegments[i] + "/";
+					}
+					else
+					{
+						prefixParent = string.Format("{0}{1}/", prefixParent, nameSegments[i]);
+					}
+				}
+			}
+			else
+			{
+				prefixParent = string.Empty;
+			}
+
+			return prefixParent;
+		}
+
+
+
+		/// <summary>
+		/// Get the name of the blob without the prefix.
+		/// </summary>
+		/// <param name="nameSegments">All the segments of the blob name.</param>
+		/// <returns>The name with extensions of the blob.</returns>
+		private static string GetBlobName(string blobName)
+		{
+			var nameSegments = GetBlobNameSegments(blobName);
+
+			if (nameSegments.Length > 1)
+			{
+				// Get the name
+				return nameSegments[nameSegments.Length - 1];
+			}
+			else
+			{
+				return nameSegments[nameSegments.Length - 1];
+			}
+		}
+
+		private static string[] GetBlobNameSegments(string blobName)
+		{
+			var nameSegments = blobName.Split(new char[] { '/' });
+
+			if (nameSegments == null || nameSegments.Length == 0)
+				throw new ArgumentException("Segments must at least contain 1 segment", "nameSegments");
+
+			return nameSegments;
+		}
+
 		private static CloudBlobContainer GetContainer(CloudBlobClient blobClient, string containerName)
 		{
 			// Retrieve a reference to a container.
@@ -363,7 +479,7 @@ namespace FileManager.Controllers
 
 	}
 
-	public class GetContainerBlobsViewModel
+	public class ContainerViewModel
 	{
 
 		private readonly List<BlobItemViewModel> blobs = new List<BlobItemViewModel>();
@@ -376,7 +492,43 @@ namespace FileManager.Controllers
 			}
 		}
 
-		public string CurrentContainerName { get; set; }
+		public string PrefixParentFull
+		{
+			get
+			{
+				var firstBlob = blobs.First(b => b.BlobType == FileController.BlobItemType.CloudBlockBlob);
+
+				return FileController.GetPrefixFullParent(firstBlob.PrefixFull);
+			}
+		}
+
+		/// <summary>
+		/// The complete breadcrumb for the current directory. Must not be used for browsing or as prefix for navigation.
+		/// </summary>
+		public string BreadCrumb
+		{
+			get
+			{
+				var firstBlob = blobs.FirstOrDefault(b => b.BlobType == FileController.BlobItemType.CloudBlockBlob);
+
+				string breadCrumb = string.Empty;
+
+				if (firstBlob == null)
+				{
+					breadCrumb = ContainerName;
+				}
+				else
+				{
+					breadCrumb = String.Format("{0}/{1}", ContainerName, firstBlob.PrefixFull);
+				}
+
+				return breadCrumb;
+			}
+		}
+
+		public string ContainerName { get; set; }
+
+		public bool IsRootDirectory { get; set; }
 
 		public bool IsPrivateContainer { get; set; }
 

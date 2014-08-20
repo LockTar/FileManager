@@ -28,35 +28,49 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
 		return trimTrailingZeros(sizeInBytes / gigaByte) + ' GB';
 	}
 
+	function GetContainer(prefix, self) {
+		$.getJSON("File/GetContainerBlobs",
+            { containerName: self.ContainerName(), prefix: prefix },
+            function (data, textStatus, jqXHR) {
+                self.ContainerName(data.ContainerName);
+                self.IsPrivateContainer(data.IsPrivateContainer);
+                self.BreadCrumb(data.BreadCrumb);
+                self.PrefixParentFull(data.PrefixParentFull);
+                self.IsRootDirectory(data.IsRootDirectory);
+
+                self.Blobs.removeAll();
+
+                ko.utils.arrayForEach(data.Blobs, function (blob) {
+                	self.Blobs.push(new BlobItemViewModel(blob, self));
+                });
+            }
+        );
+	}
+
 	function ContainerViewModel(containerName) {
 		var self = this;
 
 		self.ContainerName = ko.observable(containerName);
 		self.IsPrivateContainer = ko.observable();
+		self.BreadCrumb = ko.observable();
+		self.PrefixParentFull = ko.observable();
+		self.IsRootDirectory = ko.observable();
 		self.Blobs = ko.observableArray();
 
 		self.Update = function (directory) {
 			// Get content of the selected directory
-			var prefix;
+			var prefix = null;
 			if (directory) {
 				prefix = directory.PrefixFull();
 			}
 
-			$.getJSON("File/GetContainerBlobs",
-                { containerName: self.ContainerName(), prefix: prefix },
-                function (data, textStatus, jqXHR) {
-                	self.ContainerName(data.CurrentContainerName);
-                	self.IsPrivateContainer(data.IsPrivateContainer);
-
-                	self.Blobs.removeAll();
-
-                	ko.utils.arrayForEach(data.Blobs, function (blob) {
-                		self.Blobs.push(new BlobItemViewModel(blob, self));
-                	});
-                }
-            );
+			GetContainer(prefix, self);
 		}
-		
+
+		self.ParentDirectory = function () {
+			GetContainer(self.PrefixParentFull(), self)
+		}
+
 		self.DeleteFile = function (file) {
 			console.log('Delete file in Container: ' + self.ContainerName + ' File: ' + file.Name() + ' Prefix: ' + file.PrefixFull());
 
@@ -106,7 +120,7 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
 		PageViewModel: function (containerName) {
 			var self = this;
 
-			self.containersViewModel = new ContainerViewModel(containerName);
+			self.containerViewModel = new ContainerViewModel(containerName);
 
 			self.uploadsViewModel = new UploadsViewModel();
 		},
