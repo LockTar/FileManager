@@ -103,3 +103,9 @@ body {
   display: inline-block;
   border-radius: 50%;
 }*/
+
+
+/* Give the table a pointer because you can select an item */
+table.table-hover tbody tr:hover > td {
+  cursor: pointer
+}
