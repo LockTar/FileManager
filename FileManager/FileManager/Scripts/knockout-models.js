@@ -37,6 +37,7 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
                 self.BreadCrumb(data.BreadCrumb);
                 self.PrefixParentFull(data.PrefixParentFull);
                 self.IsRootDirectory(data.IsRootDirectory);
+                self.PrefixFull(data.PrefixFull);
 
                 self.Blobs.removeAll();
 
@@ -55,6 +56,7 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
 		self.BreadCrumb = ko.observable();
 		self.PrefixParentFull = ko.observable();
 		self.IsRootDirectory = ko.observable();
+		self.PrefixFull = ko.observable();
 		self.Blobs = ko.observableArray();
 
 		self.Update = function (directory) {
@@ -69,6 +71,10 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
 
 		self.ParentDirectory = function () {
 			GetContainer(self.PrefixParentFull(), self)
+		}
+
+		self.RefreshDirectory = function () {
+			GetContainer(self.PrefixFull(), self)
 		}
 
 		self.DeleteFile = function (file) {

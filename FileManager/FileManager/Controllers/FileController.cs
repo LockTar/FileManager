@@ -95,6 +95,8 @@ namespace FileManager.Controllers
 			ContainerViewModel vm = new ContainerViewModel()
 			{
 				ContainerName = containerName,
+				PrefixFull = prefix,
+				PrefixParentFull = GetPrefixFullParent(prefix),
 				IsRootDirectory = string.IsNullOrWhiteSpace(prefix)
 			};
 
@@ -393,11 +395,11 @@ namespace FileManager.Controllers
 		/// <summary>
 		/// Get the full prefix of the parent directory.
 		/// </summary>
-		/// <param name="prefixFull">A full prefix of a blob in the current directory.</param>
+		/// <param name="prefix">The current prefix of the current directory.</param>
 		/// <returns>The full prefix of the parent directory otherwise empty string.</returns>
-		public static string GetPrefixFullParent(string prefixFull)
+		public static string GetPrefixFullParent(string prefix)
 		{
-			var nameSegments = GetBlobNameSegments(prefixFull);
+			var nameSegments = GetBlobNameSegments(prefix);
 			string prefixParent = string.Empty;
 
 			if (nameSegments.Length > 1)
@@ -422,9 +424,7 @@ namespace FileManager.Controllers
 
 			return prefixParent;
 		}
-
-
-
+		
 		/// <summary>
 		/// Get the name of the blob without the prefix.
 		/// </summary>
@@ -492,15 +492,12 @@ namespace FileManager.Controllers
 			}
 		}
 
-		public string PrefixParentFull
-		{
-			get
-			{
-				var firstBlob = blobs.First(b => b.BlobType == FileController.BlobItemType.CloudBlockBlob);
+		/// <summary>
+		/// The prefix of the current directory. With this you could refresh the directory
+		/// </summary>
+		public string PrefixFull { get; set; }
 
-				return FileController.GetPrefixFullParent(firstBlob.PrefixFull);
-			}
-		}
+		public string PrefixParentFull { get; set; }
 
 		/// <summary>
 		/// The complete breadcrumb for the current directory. Must not be used for browsing or as prefix for navigation.
