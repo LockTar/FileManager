@@ -125,7 +125,10 @@
 							<!-- ko if: IsDirectory -->
 							<tr data-bind="click: $parent.Update">
 								<td></td>
-								<td data-bind="text: Name"></td>
+								<td>
+									<span class="glyphicon glyphicon-folder-open"></span>
+									<span data-bind="text: '&nbsp;' + Name()"></span>
+								</td>
 								<td colspan="2"></td>
 							</tr>
 							<!-- /ko -->
