@@ -28,24 +28,30 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
 		return trimTrailingZeros(sizeInBytes / gigaByte) + ' GB';
 	}
 
+	function removeAllBlobs(blobsArray) {
+		blobsArray.removeAll();
+	}
+
 	function GetContainer(prefix, self) {
 		$.getJSON("File/GetContainerBlobs",
             { containerName: self.ContainerName(), prefix: prefix },
             function (data, textStatus, jqXHR) {
-                self.ContainerName(data.ContainerName);
-                self.IsPrivateContainer(data.IsPrivateContainer);
-                self.BreadCrumb(data.BreadCrumb);
-                self.PrefixParentFull(data.PrefixParentFull);
-                self.IsRootDirectory(data.IsRootDirectory);
-                self.PrefixFull(data.PrefixFull);
+            	self.ContainerName(data.ContainerName);
+            	self.IsPrivateContainer(data.IsPrivateContainer);
+            	self.BreadCrumb(data.BreadCrumb);
+            	self.PrefixParentFull(data.PrefixParentFull);
+            	self.IsRootDirectory(data.IsRootDirectory);
+            	self.PrefixFull(data.PrefixFull);
 
-                self.Blobs.removeAll();
+            	removeAllBlobs(self.Blobs);
 
-                ko.utils.arrayForEach(data.Blobs, function (blob) {
-                	self.Blobs.push(new BlobItemViewModel(blob, self));
-                });
+            	ko.utils.arrayForEach(data.Blobs, function (blob) {
+            		self.Blobs.push(new BlobItemViewModel(blob, self));
+            	});
             }
-        );
+        ).done(function (data, textStatus, jqXHR) {        	
+        	console.log(textStatus + " " + jqXHR.status + " " + jqXHR.statusText);
+        });
 	}
 
 	function ContainerViewModel(containerName) {
@@ -78,7 +84,7 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
 		}
 
 		self.DeleteFile = function (file) {
-			console.log('Delete file in Container: ' + self.ContainerName + ' File: ' + file.Name() + ' Prefix: ' + file.PrefixFull());
+			console.log('Delete file in Container: ' + self.ContainerName() + ' File: ' + file.Name() + ' Prefix: ' + file.PrefixFull());
 
 			// Delete the selected file
 			$.post("File/DeleteFile",
@@ -86,11 +92,21 @@ define(['knockout', 'knockoutMapper'], function (ko, koMap) {
 					containerName: self.ContainerName,
 					fileName: file.Name(),
 					prefix: file.PrefixFull()
-				},
-				function () {
+				}).done(function (data, textStatus, jqXHR) {
+					console.log(textStatus + " " + jqXHR.status + " " + jqXHR.statusText);
+
+					// remove the blob from the array
 					self.Blobs.remove(file);
-				}
-			);
+				}).fail(function (jqXHR, textStatus, statusText) {
+					console.log(textStatus + " " + jqXHR.status + " " + jqXHR.statusText);
+				}).always(function (jqXHR, textStatus, jqXHR2) {
+					if (textStatus === "success") {
+						// because jqXHR is switching if action is succeeding
+						jqXHR = jqXHR2;
+					}
+
+					console.log(textStatus + " " + jqXHR.status + " " + jqXHR.statusText);
+				});
 		}
 
 		self.Update();

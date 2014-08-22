@@ -122,42 +122,10 @@ namespace FileManager.Controllers
 					Console.WriteLine("Block blob of length {0}: {1}", blob.Properties.Length, blob.Uri);
 
 					// Get the name and prefix of the blob
-					var nameSegments = GetBlobNameSegments(blob.Name);
 					string blobName = GetBlobName(blob.Name);
 					string prefixFull = GetPrefixFull(blob.Name);
 					string prefixLast = GetPrefixLast(blob.Name);
-
-
-
-					//if (nameSegments.Length > 1)
-					//{
-					//	// Get the name
-					//	blobName = nameSegments[nameSegments.Length - 1];
-
-					//	// Get the prefix of the blob
-					//	prefixLast = nameSegments[nameSegments.Length - 2];
-
-					//	// Get the full prefix
-					//	for (int i = 0; i < nameSegments.Length - 1; i++)
-					//	{
-					//		if (string.IsNullOrWhiteSpace(prefixFull))
-					//		{
-					//			prefixFull = nameSegments[i] + "/";
-					//		}
-					//		else
-					//		{
-					//			prefixFull = string.Format("{0}{1}/", prefixFull, nameSegments[i]);
-					//		}
-					//	}
-					//}
-					//else
-					//{
-					//	blobName = nameSegments[nameSegments.Length - 1];
-					//	prefixFull = string.Empty;
-					//	prefixLast = string.Empty;
-					//}
-
-
+					
 					blobs.Add(new BlobItemViewModel()
 					{
 						BlobType = BlobItemType.CloudBlockBlob,
@@ -332,8 +300,10 @@ namespace FileManager.Controllers
 			// Retrieve reference to a blob named "myblob.txt".
 			var blob = container.GetBlobReferenceFromServer(prefix + fileName);
 
+			//throw new NullReferenceException("We hebben een nul hier hoor...");
+
 			// Delete the blob.
-			blob.Delete();
+			//blob.Delete();
 		}
 
 		#region Private Methods
