@@ -299,11 +299,9 @@ namespace FileManager.Controllers
 
 			// Retrieve reference to a blob named "myblob.txt".
 			var blob = container.GetBlobReferenceFromServer(prefix + fileName);
-
-			//throw new NullReferenceException("We hebben een nul hier hoor...");
-
+						
 			// Delete the blob.
-			//blob.Delete();
+			blob.Delete();
 		}
 
 		#region Private Methods
