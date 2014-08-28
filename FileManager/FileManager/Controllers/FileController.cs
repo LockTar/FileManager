@@ -29,34 +29,17 @@ namespace FileManager.Controllers
 		{
 			string subdirectory = "";
 
-			if (string.IsNullOrWhiteSpace(containerName))
-			{
-				throw new ArgumentNullException("containerName", "Cannot upload file without container");
-			}
-
-			if (file == null)
-			{
-				throw new ArgumentNullException("file", "No file uploaded");
-			}
+			CheckContainerName(containerName, "Cannot upload file without container");
+			CheckUploadedFile(file, "No file uploaded");
 
 			CloudStorageAccount storageAccount = GetStorageAccount();
 			CloudBlobClient blobClient = GetBlobClient(storageAccount);
 			CloudBlobContainer container = GetContainer(blobClient, containerName);
 
-			string fileName = Path.GetFileNameWithoutExtension(file.FileName);
-			if (!ValidateFileName(fileName))
-			{
-				throw new ArgumentException("Incorrect filename", fileName);
-			}
-			string fileNameSaved = fileName.ToLower();
-			if (!string.IsNullOrWhiteSpace(subdirectory))
-			{
-				subdirectory = subdirectory.Trim().ToLower() + "/";
-			}
-			fileNameSaved = prefix + subdirectory + fileNameSaved + Path.GetExtension(file.FileName);
+			string blobName = CreateBlobName(file.FileName, prefix, ref subdirectory);
 
 			// Retrieve reference to a blob named "fotoRalph".
-			CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileNameSaved);
+			CloudBlockBlob blockBlob = container.GetBlockBlobReference(blobName);
 
 			// Create or overwrite the "fotoRalph" blob with contents from a local file.
 			blockBlob.UploadFromStream(file.InputStream);
@@ -81,10 +64,7 @@ namespace FileManager.Controllers
 
 		public JsonResult GetContainerBlobs(string containerName, string prefix = null)
 		{
-			if (string.IsNullOrWhiteSpace(containerName))
-			{
-				throw new ArgumentNullException("containerName", "Cannot get files without container");
-			}
+			CheckContainerName(containerName, "Cannot get files without container");
 
 			CloudStorageAccount storageAccount = GetStorageAccount();
 			CloudBlobClient blobClient = GetBlobClient(storageAccount);
@@ -123,7 +103,7 @@ namespace FileManager.Controllers
 					string blobName = GetBlobName(blob.Name);
 					string prefixFull = GetPrefixFull(blob.Name);
 					string prefixLast = GetPrefixLast(blob.Name);
-					
+
 					blobs.Add(new BlobItemViewModel()
 					{
 						BlobType = BlobItemType.CloudBlockBlob,
@@ -200,10 +180,7 @@ namespace FileManager.Controllers
 
 		public ActionResult UploadFile(string containerName, string prefix = null)
 		{
-			if (string.IsNullOrWhiteSpace(containerName))
-			{
-				throw new ArgumentNullException("containerName", "Cannot upload file without container");
-			}
+			CheckContainerName(containerName, "Cannot upload file without container");
 
 			ViewBag.ContainerName = containerName;
 			ViewBag.Prefix = prefix;
@@ -214,15 +191,8 @@ namespace FileManager.Controllers
 		[HttpPost]
 		public ActionResult UploadFile(string containerName, HttpPostedFileWrapper file, string prefix = null, string subdirectory = null)
 		{
-			if (string.IsNullOrWhiteSpace(containerName))
-			{
-				throw new ArgumentNullException("containerName", "Cannot upload file without container");
-			}
-
-			if (file == null)
-			{
-				throw new ArgumentNullException("file", "No file uploaded");
-			}
+			CheckContainerName(containerName, "Cannot upload file without container");
+			CheckUploadedFile(file, "No file uploaded");
 
 			CloudStorageAccount storageAccount = GetStorageAccount();
 			CloudBlobClient blobClient = GetBlobClient(storageAccount);
@@ -297,12 +267,62 @@ namespace FileManager.Controllers
 
 			// Retrieve reference to a blob named "myblob.txt".
 			var blob = container.GetBlobReferenceFromServer(prefix + fileName);
-						
+
 			// Delete the blob.
 			blob.Delete();
 		}
 
 		#region Private Methods
+
+		private static void CheckContainerName(string containerName, string errorMessage)
+		{
+			if (string.IsNullOrWhiteSpace(containerName))
+			{
+				throw new ArgumentNullException("containerName", errorMessage);
+			}
+		}
+
+		private static void CheckUploadedFile(HttpPostedFileBase file, string errorMessage)
+		{
+			if (file == null)
+			{
+				throw new ArgumentNullException("file", errorMessage);
+			}
+		}
+
+		////private static string CreateThumbBlobName(string uploadFileName, string prefix, ref string subdirectory)
+		////{
+		////	string blobName = CreateBlobNameWithoutExtension(uploadFileName, prefix, ref subdirectory);
+		////	blobName = blobName + Path.GetExtension(uploadFileName);
+
+		////	return blobName;
+		////}
+
+		private static string CreateBlobName(string uploadFileName, string prefix, ref string subdirectory)
+		{
+			string blobName = CreateBlobNameWithoutExtension(uploadFileName, prefix, ref subdirectory);
+			blobName = blobName + Path.GetExtension(uploadFileName);
+
+			return blobName;
+		}
+
+		private static string CreateBlobNameWithoutExtension(string uploadFileName, string prefix, ref string subdirectory)
+		{
+			string fileName = Path.GetFileNameWithoutExtension(uploadFileName);
+			if (!ValidateFileName(fileName))
+			{
+				throw new ArgumentException("Incorrect filename", fileName);
+			}
+			string blobName = fileName.ToLower();
+			if (!string.IsNullOrWhiteSpace(subdirectory))
+			{
+				subdirectory = subdirectory.Trim().ToLower() + "/";
+			}
+
+			blobName = prefix + subdirectory + blobName;
+
+			return blobName;
+		}
 
 		private static CloudBlobClient GetBlobClient(CloudStorageAccount storageAccount)
 		{
@@ -390,7 +410,7 @@ namespace FileManager.Controllers
 
 			return prefixParent;
 		}
-		
+
 		/// <summary>
 		/// Get the name of the blob without the prefix.
 		/// </summary>
