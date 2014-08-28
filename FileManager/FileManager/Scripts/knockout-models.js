@@ -212,6 +212,14 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
 		PageViewModel: function (containerName) {
 			var self = this;
 
+			self.UploadsEnabled = ko.observable(false);
+			self.EnableUploads = function() {
+				self.UploadsEnabled(true);
+			};
+			self.DisableUploads = function() {
+				self.UploadsEnabled(false);
+			}
+
 			self.uploadsViewModel = new UploadsViewModel(self);
 			self.containerViewModel = new ContainerViewModel(containerName, self);
 		},
