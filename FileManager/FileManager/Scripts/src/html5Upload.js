@@ -13,7 +13,7 @@ define(function () {
     function UploadManager(options) {
     	var self = this;
 
-    	self.containerViewModel = options.containerViewModel;
+    	self.pageViewModel = options.pageViewModel;
         self.dropContainer = options.dropContainer;
         self.inputField = options.inputField;
         self.uploadsQueue = [];
@@ -179,7 +179,8 @@ define(function () {
                     manager.ajaxUpload(manager.uploadsQueue.shift());
                 } else {
                 	// Refresh the list of files because all uploads are done
-                	manager.containerViewModel.RefreshDirectory();
+                    manager.pageViewModel.containerViewModel.RefreshDirectory();
+                    manager.pageViewModel.DisableUploadArea();
                 }
             };
 
@@ -200,8 +201,8 @@ define(function () {
 
             // Append file data:
             formData.append(key, file);
-            formData.append('containerName', manager.containerViewModel.ContainerName());
-            formData.append('prefix', manager.containerViewModel.PrefixFull());
+            formData.append('containerName', manager.pageViewModel.containerViewModel.ContainerName());
+            formData.append('prefix', manager.pageViewModel.containerViewModel.PrefixFull());
 
             // Initiate upload:
             xhr.send(formData);

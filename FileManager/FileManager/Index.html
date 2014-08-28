@@ -1,42 +1,65 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<!--<link rel="icon" href="../../favicon.ico">-->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--<link rel="icon" href="../../favicon.ico">-->
 
-	<title>Dashboard Template for Bootstrap</title>
+    <title>Dashboard Template for Bootstrap</title>
 
-	<!-- Bootstrap core CSS -->
-	<link href="Content/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap core CSS -->
+    <link href="Content/bootstrap.min.css" rel="stylesheet">
 
-	<!-- Custom styles for this template -->
-	<link href="dashboard.css" rel="stylesheet">
-	<link href="Content/styles.css" rel="stylesheet" type="text/css" />
+    <!-- Custom styles for this template -->
+    <link href="dashboard.css" rel="stylesheet">
+    <link href="Content/styles.css" rel="stylesheet" type="text/css" />
 
-	<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-	<!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-	<!--<script src="../../assets/js/ie-emulation-modes-warning.js"></script>-->
-	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-	<!--<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>-->
-	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-	<!--[if lt IE 9]>
-	  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-	  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-	<![endif]-->
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <!--<script src="../../assets/js/ie-emulation-modes-warning.js"></script>-->
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <!--<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>-->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+        .header-button {
+            color: #0072c6;
+            font-size: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            background-color: transparent;
+            border: 0;
+        }
+
+            .header-button:hover, .header-button:active {
+                color: #004d85;
+            }
+
+            .header-button:focus {
+                outline: 0;
+            }
+    </style>
 </head>
 
 <body>
-    <div class="container-fluid" >
+    <div class="container-fluid">
         <div class="row">
-            <div id="page-viewmodel" class="col-sm-12 col-sm-offset-0 col-md-12 col-md-offset-0 main" data-bind="event: { dragover: EnableUploads, mouseover: DisableUploads }">
-                <h1 data-bind="text: containerViewModel.ContainerName"></h1>
+            <div id="page-viewmodel" class="col-sm-12 col-sm-offset-0 col-md-12 col-md-offset-0 main">
+                <!--data-bind="event: { dragover: EnableUploads, mouseover: DisableUploads }">-->
+                <h1>
+                    <span data-bind="text: containerViewModel.ContainerName"></span>
+                    <button type="button" id="toggleUploadArea" class="header-button" data-bind="click: ToggleUploadArea"><span class="glyphicon glyphicon-upload"></span> Upload files</button>
+                    <button type="button" id="toggleAddDirectory" class="header-button" data-bind="click: ToggleAddDirectoryArea"><span class="glyphicon glyphicon-plus"></span> New directory</button>
+                </h1>
 
-                <!--<div class="row" data-bind="">-->
-                <div class="row" data-bind="visible: UploadsEnabled">
+                <div class="row" data-bind="fadeVisible: UploadAreaEnabled">
                     <div class="col-sm-12" data-bind="with: uploadsViewModel">
                         <div id="dragndropimage" class="uploadimage-dragndrop">
                             <div class="uploadimage-text">Drag images here</div>
@@ -52,8 +75,13 @@
                     </div>
                 </div>
 
-                <!--<div class="row" data-bind="">-->
-                <div class="row" data-bind="visible: UploadsEnabled() == false">
+                <div class="row" data-bind="fadeVisible: AddDirectoryAreaEnabled">
+                    <div class="col-sm-12" data-bind="with: containerViewModel">
+                        <input type="text" data-bind="value: NewDirectoryName, hasFocus: $parent.NewDirectoryNameFocus" /> <button type="button" id="addDirectory" class="btn btn-primary" data-bind="click: AddDirectory">Add</button>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
                     <div class="col-lg-12" data-bind="with: containerViewModel">
                         <div class="input-group">
                             <span class="input-group-btn">
@@ -112,12 +140,18 @@
                                     <!-- /ko -->
 
                                 </tbody>
+
+                                <!--<tbody data-bind="visible: Blobs().length = 0">
+                                    <tr>
+                                        <td colspan="4" style="text-align: center;">This directory is empty</td>
+                                    </tr>
+                                </tbody>-->
                             </table>
                         </div>
                     </div>
                 </div>
 
-                
+
             </div>
         </div>
     </div>
@@ -170,7 +204,6 @@
             $(drop).removeClass("uploadimage-dragndrop-hover");
         };
     </script>
-
 
     <script type="text/javascript" data-main="/Scripts/main" src="Scripts/require.js"></script>
 </body>

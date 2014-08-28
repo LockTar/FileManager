@@ -492,17 +492,25 @@ namespace FileManager.Controllers
 		{
 			get
 			{
-				var firstBlob = blobs.FirstOrDefault(b => b.BlobType == FileController.BlobItemType.CloudBlockBlob);
+				//var firstBlob = blobs.FirstOrDefault(b => b.BlobType == FileController.BlobItemType.CloudBlockBlob);
 
-				string breadCrumb = string.Empty;
+				//string breadCrumb = string.Empty;
 
-				if (firstBlob == null)
+				//if (firstBlob == null)
+				//{
+				//	breadCrumb = ContainerName;
+				//}
+				//else
+				//{
+				//	breadCrumb = string.Format("{0}/{1}", ContainerName, firstBlob.PrefixFull);
+				//}
+
+				//return breadCrumb;
+
+				string breadCrumb = string.Format("{0}/{1}", ContainerName, PrefixFull);
+				if (breadCrumb.Last() == '/')
 				{
-					breadCrumb = ContainerName;
-				}
-				else
-				{
-					breadCrumb = String.Format("{0}/{1}", ContainerName, firstBlob.PrefixFull);
+					breadCrumb = breadCrumb.Remove(breadCrumb.Length - 1, 1);
 				}
 
 				return breadCrumb;
