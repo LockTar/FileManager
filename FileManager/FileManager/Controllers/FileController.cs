@@ -25,11 +25,9 @@ namespace FileManager.Controllers
 
 		private const string defaultContainerName = "New folder";
 
-		public ActionResult Upload(HttpPostedFileBase file)
+		public ActionResult Upload(HttpPostedFileBase file, string containerName, string prefix = null)
 		{
-			string containerName = "newsarticleimages";
-			string prefix = "";
-			string subdirectory = "SubDirectory";
+			string subdirectory = "";
 
 			if (string.IsNullOrWhiteSpace(containerName))
 			{

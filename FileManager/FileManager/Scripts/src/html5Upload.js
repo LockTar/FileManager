@@ -11,7 +11,9 @@ define(function () {
 
     // Upload manager constructor:
     function UploadManager(options) {
-        var self = this;
+    	var self = this;
+
+    	self.containerViewModel = options.containerViewModel;
         self.dropContainer = options.dropContainer;
         self.inputField = options.inputField;
         self.uploadsQueue = [];
@@ -21,6 +23,7 @@ define(function () {
         self.maxSimultaneousUploads = options.maxSimultaneousUploads || -1;
         self.onFileAdded = options.onFileAdded || noop;
         self.uploadUrl = options.uploadUrl;
+
         self.onFileAddedProxy = function (upload) {
             console.log('Event: onFileAdded, file: ' + upload.fileName);
             self.onFileAdded(upload);
@@ -174,6 +177,9 @@ define(function () {
                 // Check if there are any uploads left in a queue:
                 if (manager.uploadsQueue.length) {
                     manager.ajaxUpload(manager.uploadsQueue.shift());
+                } else {
+                	// Refresh the list of files because all uploads are done
+                	manager.containerViewModel.RefreshDirectory();
                 }
             };
 
@@ -194,6 +200,8 @@ define(function () {
 
             // Append file data:
             formData.append(key, file);
+            formData.append('containerName', manager.containerViewModel.ContainerName());
+            formData.append('prefix', manager.containerViewModel.PrefixFull());
 
             // Initiate upload:
             xhr.send(formData);
@@ -225,7 +233,7 @@ define(function () {
     };
 
     module.initialize = function (options) {
-        return new UploadManager(options);
+        new UploadManager(options);
     };
 
     return module;
