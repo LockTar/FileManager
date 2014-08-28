@@ -30,150 +30,149 @@
 </head>
 
 <body>
-	<div class="container-fluid">
-		<div class="row">
-			<div id="page-viewmodel" class="col-sm-12 col-sm-offset-0 col-md-12 col-md-offset-0 main">
-				<!--<h1 class="page-header">FileMan</h1>-->
-				<!--<h2 class="page-header">Upload file</h2>-->
+    <div class="container-fluid" >
+        <div class="row">
+            <div id="page-viewmodel" class="col-sm-12 col-sm-offset-0 col-md-12 col-md-offset-0 main" data-bind="event: { dragover: EnableUploads, mouseover: DisableUploads }">
+                <h1 data-bind="text: containerViewModel.ContainerName"></h1>
 
-				<div class="row" data-bind="visible: UploadsEnabled">
-					<div class="col-sm-12" data-bind="with: uploadsViewModel">
-						<div id="dragndropimage" class="uploadimage-dragndrop">
-							<div class="uploadimage-text">Drag images here</div>
-							<div>Or, if you prefer...</div>
-							<div class="uploadimage-input">
-								<div style="width:400px; margin:auto;">
-									<input type="file" multiple="multiple" name="uploadFiles" id="upload-input" style="width:400px;" />
-								</div>
-							</div>
-						</div>
+                <!--<div class="row" data-bind="">-->
+                <div class="row" data-bind="visible: UploadsEnabled">
+                    <div class="col-sm-12" data-bind="with: uploadsViewModel">
+                        <div id="dragndropimage" class="uploadimage-dragndrop">
+                            <div class="uploadimage-text">Drag images here</div>
+                            <div>Or, if you prefer...</div>
+                            <div class="uploadimage-input">
+                                <div style="width:400px; margin:auto;">
+                                    <input type="file" multiple="multiple" name="uploadFiles" id="upload-input" style="width:400px;" />
+                                </div>
+                            </div>
+                        </div>
 
-						<div id="upload-liveuploads" data-bind="template: { name: 'template-uploads' }"></div>
-					</div>
-				</div>
+                        <div id="upload-liveuploads" data-bind="template: { name: 'template-uploads' }"></div>
+                    </div>
+                </div>
 
-				<!--<h2 class="sub-header">Browse files</h2>-->
-				<h1 data-bind="text: containerViewModel.ContainerName,event: { mouseover: EnableUploads, mouseout: DisableUploads }"></h1>
+                <!--<div class="row" data-bind="">-->
+                <div class="row" data-bind="visible: UploadsEnabled() == false">
+                    <div class="col-lg-12" data-bind="with: containerViewModel">
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button type="button" title="Parent folder" class="btn btn-default" data-bind="click: ParentDirectory, enable: IsRootDirectory() == false ">
+                                    <span class="glyphicon glyphicon-arrow-up"></span>
+                                </button>
+                            </span>
+                            <input type="text" class="form-control" disabled data-bind="value: BreadCrumb">
+                            <span class="input-group-btn">
+                                <button type="button" title="Refresh folder" class="btn btn-default" data-bind="click: RefreshDirectory">
+                                    <span class="glyphicon glyphicon-refresh"></span>
+                                </button>
+                            </span>
+                        </div>
 
-				<div class="row" data-bind="with: containerViewModel">
-					<div class="col-lg-12">
-						<div class="input-group">
-							<span class="input-group-btn">
-								<button type="button" title="Parent folder" class="btn btn-default" data-bind="click: ParentDirectory, enable: IsRootDirectory() == false ">
-									<span class="glyphicon glyphicon-arrow-up"></span>
-								</button>
-							</span>
-							<input type="text" class="form-control" disabled data-bind="value: BreadCrumb">
-							<span class="input-group-btn">
-								<button type="button" title="Refresh folder" class="btn btn-default" data-bind="click: RefreshDirectory">
-									<span class="glyphicon glyphicon-refresh"></span>
-								</button>
-							</span>
-						</div><!-- /input-group -->
-					</div><!-- /.col-lg-12 -->
-				</div>
+                        <div class="table-responsive">
+                            <table id="blobList" class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Filename</th>
+                                        <th>Filetype</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: Blobs">
 
-				<div class="table-responsive" data-bind="with: containerViewModel">
-					<table id="blobList" class="table table-hover">
-						<thead>
-							<tr>
-								<th></th>
-								<th>Filename</th>
-								<th>Filetype</th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody data-bind="foreach: Blobs">
+                                    <!-- ko if: IsDirectory -->
+                                    <tr data-bind="click: $parent.Update">
+                                        <td></td>
+                                        <td>
+                                            <span class="glyphicon glyphicon-folder-open"></span>
+                                            <span data-bind="text: '&nbsp;' + Name()"></span>
+                                        </td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                    <!-- /ko -->
+                                    <!-- ko if: IsFile -->
+                                    <tr>
+                                        <td>
+                                            <button type="button" class="btn btn-default btn-xs" title="Download">
+                                                <span class="glyphicon glyphicon-download"></span>
+                                            </button>
+                                        </td>
+                                        <td data-bind="text: Name"></td>
+                                        <td data-bind="text: Uri"></td>
+                                        <td style="text-align: right;">
+                                            <button type="button" class="btn btn-warning btn-xs">
+                                                <span class="glyphicon glyphicon-pencil"></span> Edit
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-xs" data-bind="click: $parent.DeleteFile">
+                                                <span class="glyphicon glyphicon-trash"></span> Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- /ko -->
 
-							<!-- ko if: IsDirectory -->
-							<tr data-bind="click: $parent.Update">
-								<td></td>
-								<td>
-									<span class="glyphicon glyphicon-folder-open"></span>
-									<span data-bind="text: '&nbsp;' + Name()"></span>
-								</td>
-								<td colspan="2"></td>
-							</tr>
-							<!-- /ko -->
-							<!-- ko if: IsFile -->
-							<tr>
-								<td>
-									<button type="button" class="btn btn-default btn-xs" title="Download">
-										<span class="glyphicon glyphicon-download"></span>
-									</button>
-								</td>
-								<td data-bind="text: Name"></td>
-								<td data-bind="text: Uri"></td>
-								<td style="text-align: right;">
-									<button type="button" class="btn btn-warning btn-xs">
-										<span class="glyphicon glyphicon-pencil"></span> Edit
-									</button>
-									<button type="button" class="btn btn-danger btn-xs" data-bind="click: $parent.DeleteFile">
-										<span class="glyphicon glyphicon-trash"></span> Delete
-									</button>
-								</td>
-							</tr>
-							<!-- /ko -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-
-
-	<script type="text/html" id="template-uploads">
-		<div data-bind="visible: showTotalProgress()">
-			<div>
-				<span data-bind="text: uploadSpeedFormatted()"></span>
-				<span data-bind="text: timeRemainingFormatted()" style="float: right;"></span>
-			</div>
-			<div class="uploadimage-totalprogress">
-				<div class="uploadimage-totalprogressbar" style="width: 0%;" data-bind="style: { width: totalProgress() + '%' }"></div>
-			</div>
-		</div>
-		<div data-bind="foreach: uploads">
-			<div class="uploadimage-upload" data-bind="css: { 'uploadimage-uploadcompleted': uploadCompleted() }">
-				<div class="uploadimage-fileinfo">
-					<strong data-bind="text: fileName"></strong>
-					<span data-bind="text: fileSizeFormated"></span>
-					<span class="uploadimage-progresspct" data-bind="visible: uploadProgress() < 100"><span data-bind="text: uploadSpeedFormatted()"></span></span>
-				</div>
-				<div class="uploadimage-progress">
-					<div class="uploadimage-progressbar" style="width: 0%;" data-bind="style: { width: uploadProgress() + '%' }"></div>
-				</div>
-			</div>
-		</div>
-	</script>
+                
+            </div>
+        </div>
+    </div>
 
 
-	<!-- Bootstrap core JavaScript
-	================================================== -->
-	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-	<script src="Scripts/bootstrap.min.js"></script>
-	<script src="docs.min.js"></script>
+    <script type="text/html" id="template-uploads">
+        <div data-bind="visible: showTotalProgress()">
+            <div>
+                <span data-bind="text: uploadSpeedFormatted()"></span>
+                <span data-bind="text: timeRemainingFormatted()" style="float: right;"></span>
+            </div>
+            <div class="uploadimage-totalprogress">
+                <div class="uploadimage-totalprogressbar" style="width: 0%;" data-bind="style: { width: totalProgress() + '%' }"></div>
+            </div>
+        </div>
+        <div data-bind="foreach: uploads">
+            <div class="uploadimage-upload" data-bind="css: { 'uploadimage-uploadcompleted': uploadCompleted() }">
+                <div class="uploadimage-fileinfo">
+                    <strong data-bind="text: fileName"></strong>
+                    <span data-bind="text: fileSizeFormated"></span>
+                    <span class="uploadimage-progresspct" data-bind="visible: uploadProgress() < 100"><span data-bind="text: uploadSpeedFormatted()"></span></span>
+                </div>
+                <div class="uploadimage-progress">
+                    <div class="uploadimage-progressbar" style="width: 0%;" data-bind="style: { width: uploadProgress() + '%' }"></div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+    <script src="docs.min.js"></script>
 
 
 
-	<script>
-		var drop = document.getElementById("dragndropimage");
-		drop.addEventListener("dragover", change, false);
-		drop.addEventListener("dragleave", change_back, false);
-		drop.addEventListener("drop", change_back, false);
+    <script>
+        var drop = document.getElementById("dragndropimage");
+        drop.addEventListener("dragover", change, false);
+        drop.addEventListener("mouseover", change_back, false);
 
-		function change() {
-			$(drop).addClass("uploadimage-dragndrop-hover");
-		};
+        function change() {
+            $(drop).addClass("uploadimage-dragndrop-hover");
+        };
 
-		function change_back() {
-			$(drop).removeClass("uploadimage-dragndrop-hover");
-		};
-	</script>
+        function change_back() {
+            $(drop).removeClass("uploadimage-dragndrop-hover");
+        };
+    </script>
 
 
-	<script type="text/javascript" data-main="/Scripts/main" src="Scripts/require.js"></script>
+    <script type="text/javascript" data-main="/Scripts/main" src="Scripts/require.js"></script>
 </body>
 
 </html>

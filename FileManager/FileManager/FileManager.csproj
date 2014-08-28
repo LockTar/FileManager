@@ -120,6 +120,7 @@
     <Content Include="dashboard.css" />
     <Content Include="Content\styles.css" />
     <Content Include="docs.min.js" />
+    <Content Include="DragEvents.html" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
