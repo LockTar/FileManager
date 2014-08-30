@@ -77,7 +77,8 @@
 
                 <div class="row" data-bind="fadeVisible: AddDirectoryAreaEnabled">
                     <div class="col-sm-12" data-bind="with: containerViewModel">
-                        <input type="text" data-bind="value: NewDirectoryName, hasFocus: $parent.NewDirectoryNameFocus" /> <button type="button" id="addDirectory" class="btn btn-primary" data-bind="click: AddDirectory">Add</button>
+                        <input type="text" data-bind="textInput: NewDirectoryName, hasFocus: $parent.NewDirectoryNameFocus" onkeyup="if (event.keyCode == 13) { document.getElementById('addDirectory').click(); }" />
+                        <button type="button" id="addDirectory" class="btn btn-primary" data-bind="click: AddDirectory, disable: NewDirectoryName() == ''">Add</button>
                     </div>
                 </div>
 
