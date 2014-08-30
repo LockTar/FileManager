@@ -138,6 +138,8 @@
     <Content Include="Scripts\knockout-models.js" />
     <Content Include="Scripts\knockout.mapping-latest.debug.js" />
     <Content Include="Scripts\knockout.mapping-latest.js" />
+    <Content Include="Scripts\knockout.validation.debug.js" />
+    <Content Include="Scripts\knockout.validation.js" />
     <Content Include="Scripts\main.js" />
     <Content Include="Scripts\main2.js" />
     <Content Include="Scripts\src\html5Upload.js" />
