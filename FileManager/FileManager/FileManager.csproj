@@ -119,7 +119,6 @@
     <Content Include="dashboard.css" />
     <Content Include="Content\styles.css" />
     <Content Include="docs.min.js" />
-    <Content Include="DragEvents.html" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -128,7 +127,6 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
-    <Content Include="Index_old.html" />
     <Content Include="Index.html" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -141,7 +139,6 @@
     <Content Include="Scripts\knockout.validation.debug.js" />
     <Content Include="Scripts\knockout.validation.js" />
     <Content Include="Scripts\main.js" />
-    <Content Include="Scripts\main2.js" />
     <Content Include="Scripts\src\html5Upload.js" />
     <Content Include="Scripts\jquery-2.1.1.js" />
     <Content Include="Scripts\jquery-2.1.1.min.js" />
