@@ -4,6 +4,8 @@
 define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload, ko, koMap) {
     'use strict';
 
+    ko.mapping = koMap;
+
     // Here's a custom Knockout binding that makes elements shown/hidden via jQuery's fadeIn()/fadeOut() methods
     // Could be stored in a separate utility library
     ko.bindingHandlers.fadeVisible = {
@@ -141,7 +143,7 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
         var self = this;
         self.Container = container;
 
-        koMap.fromJS(data, {}, self);
+        ko.mapping.fromJS(data, {}, self);
     }
 
     function UploadsViewModel(pageViewModel) {
