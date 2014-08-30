@@ -46,13 +46,19 @@
                 outline: 0;
             }
     </style>
+    <style type="text/css">
+        .errorFill {
+            border: 1px solid red;
+            background-color: #fdd;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container-fluid">
         <div class="row">
             <div id="page-viewmodel" class="col-sm-12 col-sm-offset-0 col-md-12 col-md-offset-0 main">
-                <!--data-bind="event: { dragover: EnableUploads, mouseover: DisableUploads }">-->
+                
                 <h1>
                     <span data-bind="text: containerViewModel.ContainerName"></span>
                     <button type="button" id="toggleUploadArea" class="header-button" data-bind="click: ToggleUploadArea"><span class="glyphicon glyphicon-upload"></span> Upload files</button>
@@ -77,9 +83,9 @@
 
                 <div class="row" data-bind="fadeVisible: AddDirectoryAreaEnabled">
                     <div class="col-sm-12" data-bind="with: containerViewModel">
-                        <input type="text" data-bind="textInput: NewDirectoryName, hasFocus: $parent.NewDirectoryNameFocus" onkeyup="if (event.keyCode == 13) { document.getElementById('addDirectory').click(); }" />
-                        <button type="button" id="addDirectory" class="btn btn-primary" data-bind="click: AddDirectory, disable: NewDirectoryName() == ''">Add</button>
-                    </div>
+                        <input type="text" data-bind="value: NewDirectoryName, hasFocus: $parent.NewDirectoryNameFocus" onkeyup="if (event.keyCode == 13) { document.getElementById('addDirectory').click(); }" />
+                        <button type="button" id="addDirectory" class="btn btn-primary" data-bind="click: AddDirectory">Add</button>
+                    </div><!--, disable: NewDirectoryName() == ''-->
                 </div>
 
                 <div class="row" style="margin-top: 20px;">

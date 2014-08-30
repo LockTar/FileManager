@@ -1,10 +1,14 @@
 ﻿/*jslint browser:true*/
 /*global define*/
 
-define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload, ko, koMap) {
+define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'], function (html5Upload, ko, koMap, validation) {
     'use strict';
 
     ko.mapping = koMap;
+    ko.validation = validation;
+
+    var validationOptions = { insertMessages: true, decorateElement: true, errorElementClass: 'errorFill' };
+    ko.validation.init(validationOptions);
 
     // Here's a custom Knockout binding that makes elements shown/hidden via jQuery's fadeIn()/fadeOut() methods
     // Could be stored in a separate utility library
@@ -82,7 +86,14 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
         self.IsRootDirectory = ko.observable();
         self.PrefixFull = ko.observable();
         self.Blobs = ko.observableArray();
-        self.NewDirectoryName = ko.observable("");
+        self.NewDirectoryName = ko.observable("").extend({
+            required: true,
+            minLength: 3,
+            pattern: {
+                message: 'Hey this doesnt match my pattern',
+                params: '^[A-Z0-9].$'
+            }
+        });
 
         self.Update = function (directory) {
             // Get content of the selected directory
@@ -129,7 +140,10 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
         }
 
         self.AddDirectory = function () {
-            if (self.NewDirectoryName() !== '') {
+
+
+            //if (self.NewDirectoryName() !== '') {
+            if (self.isValid()) {
                 GetContainer(self.PrefixFull() + self.NewDirectoryName() + '/', self);
                 self.NewDirectoryName('');
                 self.PageViewModel.DisableAddDirectoryArea();
@@ -276,7 +290,7 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
             }
 
             self.uploadsViewModel = new UploadsViewModel(self);
-            self.containerViewModel = new ContainerViewModel(containerName, self);
+            self.containerViewModel = ko.validatedObservable(new ContainerViewModel(containerName, self));
         },
 
         applyBindings: function (model, context) {
