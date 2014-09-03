@@ -19,6 +19,33 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
         }
     };
 
+    ko.bindingHandlers.modal = {
+        init: function (element, valueAccessor) {
+            $(element).modal({
+                show: false
+            });
+
+            var value = valueAccessor();
+            if (ko.isObservable(value)) {
+                $(element).on('hide.bs.modal', function () {
+                    value(false);
+                });
+            }
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                $(element).modal("destroy");
+            });
+
+        },
+        update: function (element, valueAccessor) {
+            var value = valueAccessor();
+            if (ko.utils.unwrapObservable(value)) {
+                $(element).modal('show');
+            } else {
+                $(element).modal('hide');
+            }
+        }
+    }
+
     function trimTrailingZeros(number) {
         return number.toFixed(1).replace(/\.0+$/, '');
     }
@@ -132,6 +159,8 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
                 self.NewDirectoryName('');
                 self.PageViewModel.DisableAddDirectoryArea();
             }
+
+            self.PageViewModel.ShowNewDirectoryDialog(false);
         }
 
         self.Update();
@@ -256,7 +285,7 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
             self.EnableAddDirectoryArea = function () {
                 self.DisableUploadArea();
                 self.AddDirectoryAreaEnabled(true);
-                self.NewDirectoryNameFocus(true);
+                //self.NewDirectoryNameFocus(true);
             }
 
             self.DisableAddDirectoryArea = function () {
@@ -275,6 +304,15 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
 
             self.uploadsViewModel = new UploadsViewModel(self);
             self.containerViewModel = new ContainerViewModel(containerName, self);
+
+            self.IsNewDirectoryDialogShown = ko.observable(false);
+            
+            self.ShowNewDirectoryDialog = function (show) {
+                self.IsNewDirectoryDialogShown(show);
+
+                window.setTimeout(function () { self.NewDirectoryNameFocus(true); }, 501);
+                
+            };
         },
 
         applyBindings: function (model, context) {
