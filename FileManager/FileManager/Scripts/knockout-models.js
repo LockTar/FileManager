@@ -120,11 +120,11 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
         }
 
         self.ParentDirectory = function () {
-            GetContainer(self.PrefixParentFull(), self)
+            GetContainer(self.PrefixParentFull(), self);
         }
 
         self.RefreshDirectory = function () {
-            GetContainer(self.PrefixFull(), self)
+            GetContainer(self.PrefixFull(), self);
         }
 
         self.DeleteFile = function (file) {
@@ -279,40 +279,36 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
                 }
             }
 
-            self.AddDirectoryAreaEnabled = ko.observable(false);
-            self.NewDirectoryNameFocus = ko.observable(false);
-
-            self.EnableAddDirectoryArea = function () {
-                self.DisableUploadArea();
-                self.AddDirectoryAreaEnabled(true);
-                //self.NewDirectoryNameFocus(true);
-            }
-
-            self.DisableAddDirectoryArea = function () {
-                self.AddDirectoryAreaEnabled(false);
-            }
-
-            self.ToggleAddDirectoryArea = function () {
-                if (self.AddDirectoryAreaEnabled() === false) {
-                    self.DisableUploadArea();
-                    self.EnableAddDirectoryArea();
-                }
-                else {
-                    self.DisableAddDirectoryArea();
-                }
-            }
-
             self.uploadsViewModel = new UploadsViewModel(self);
             self.containerViewModel = new ContainerViewModel(containerName, self);
 
+            self.NewDirectoryNameFocus = ko.observable(false);
             self.IsNewDirectoryDialogShown = ko.observable(false);
             
             self.ShowNewDirectoryDialog = function (show) {
                 self.IsNewDirectoryDialogShown(show);
 
-                window.setTimeout(function () { self.NewDirectoryNameFocus(true); }, 501);
-                
+                window.setTimeout(function () { self.NewDirectoryNameFocus(true); }, 501);                
             };
+
+
+            self.FileToDelete = ko.observable();
+            self.IsConfirmDeleteFileDialogShown = ko.observable(false);
+            self.ConfirmDeleteFileDialog = function (file) {
+                self.FileToDelete(file);
+                self.IsConfirmDeleteFileDialogShown(true);
+            };
+            self.DeleteFile = function () {
+                self.containerViewModel.DeleteFile(self.FileToDelete());
+                self.IsConfirmDeleteFileDialogShown(false);
+            }
+
+            
+            //self.ShowConfirmDeleteFileDialog = function (show) {
+            //    self.IsConfirmDeleteFileDialogShown(show);
+
+            //    //window.setTimeout(function () { self.NewDirectoryNameFocus(true); }, 501);
+            //};
         },
 
         applyBindings: function (model, context) {
