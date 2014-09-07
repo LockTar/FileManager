@@ -98,7 +98,7 @@ namespace FileManager.Controllers
 				{
 					CloudBlockBlob blob = (CloudBlockBlob)item;
 					Console.WriteLine("Block blob of length {0}: {1}", blob.Properties.Length, blob.Uri);
-
+					
 					// Get the name and prefix of the blob
 					string blobName = GetBlobName(blob.Name);
 					string prefixFull = GetPrefixFull(blob.Name);
@@ -330,8 +330,7 @@ namespace FileManager.Controllers
 			CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 			return blobClient;
 		}
-
-
+		
 		private static string GetPrefixFull(string blobName)
 		{
 			var nameSegments = GetBlobNameSegments(blobName);
@@ -428,6 +427,20 @@ namespace FileManager.Controllers
 			else
 			{
 				return nameSegments[nameSegments.Length - 1];
+			}
+		}
+
+		internal static bool IsImage(string Name)
+		{
+			string extension = Path.GetExtension(Name).ToLower();
+
+			if (extension == ".jpg" || extension == ".gif" || extension == ".png" || extension == ".bmp")
+			{
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
 
@@ -561,6 +574,22 @@ namespace FileManager.Controllers
 				return BlobType == FileController.BlobItemType.CloudBlockBlob;
 			}
 		}
+
+		public bool IsImage
+		{
+			get
+			{
+				if (IsFile && FileController.IsImage(Name))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+
 	}
 
 	public class CreateContainerViewModel

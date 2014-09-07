@@ -45,6 +45,11 @@
             .header-button:focus {
                 outline: 0;
             }
+
+            #blobList td {
+                vertical-align: middle;
+                height: 60px;
+            }
     </style>
     <style type="text/css">
         .errorFill {
@@ -98,9 +103,10 @@
                         </div>
 
                         <div class="table-responsive">
-                            <table id="blobList" class="table table-hover table-bordered">
+                            <table id="blobList" class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th></th>
                                         <th>Filename</th>
                                         <!--<th>Filetype</th>-->
@@ -113,18 +119,25 @@
                                     <tr data-bind="click: $parent.Update">
                                         <td></td>
                                         <td>
-                                            <span class="glyphicon glyphicon-folder-open"></span>
-                                            <span data-bind="text: '&nbsp;' + Name()"></span>
+                                            <span class="glyphicon glyphicon-folder-open" style="font-size: 2.5em;"></span>
+                                        </td>
+                                        <td>
+                                            <!--<span class="glyphicon glyphicon-folder-open"></span>
+                                            <span data-bind="text: '&nbsp;' + Name()"></span>-->
+                                            <span data-bind="text: Name"></span>
                                         </td>
                                         <td colspan="2"></td>
                                     </tr>
                                     <!-- /ko -->
                                     <!-- ko if: IsFile -->
                                     <tr>
-                                        <td>
-                                            <a title="Download" class="btn btn-default btn-xs" data-bind="attr: { href: Uri }">
+                                        <td style="width: 40px;">
+                                            <a title="Download" target="_blank" class="btn btn-default btn-xs" data-bind="attr: { href: Uri }">
                                                 <span class="glyphicon glyphicon-download"></span>
                                             </a>
+                                        </td>
+                                        <td style="width: 100px;">
+                                            <img data-bind="visible: IsImage, attr: { src: Uri, alt: Name }" style="max-width: 80px; max-height: 40px;" />
                                         </td>
                                         <td data-bind="text: Name"></td>
                                         <!--<td data-bind="text: Uri"></td>-->
