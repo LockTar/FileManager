@@ -63,7 +63,7 @@
                     <span data-bind="text: containerViewModel.ContainerName"></span>
                     <button type="button" id="toggleUploadArea" class="header-button" data-bind="click: ToggleUploadArea"><span class="glyphicon glyphicon-upload"></span> Upload files</button>
                     <button type="button" id="toggleAddDirectory" class="header-button" data-bind="click: function() { ShowNewDirectoryDialog(true); }"><span class="glyphicon glyphicon-plus"></span> New directory</button>
-                </h1><!--data-bind="click: ToggleAddDirectoryArea"-->
+                </h1>
 
                 <div class="row" data-bind="fadeVisible: UploadAreaEnabled">
                     <div class="col-sm-12" data-bind="with: uploadsViewModel">
@@ -80,13 +80,7 @@
                         <div id="upload-liveuploads" data-bind="template: { name: 'template-uploads' }"></div>
                     </div>
                 </div>
-
-                <!--<div class="row" data-bind="fadeVisible: AddDirectoryAreaEnabled">
-                    <div class="col-sm-12" data-bind="with: containerViewModel">
-                        <input type="text" data-bind="value: NewDirectoryName, hasFocus: $parent.NewDirectoryNameFocus" /> <button type="button" id="addDirectory" class="btn btn-primary" data-bind="click: AddDirectory">Add</button>
-                    </div>
-                </div>-->
-
+                
                 <div class="row" style="margin-top: 20px;">
                     <div class="col-lg-12" data-bind="with: containerViewModel">
                         <div class="input-group">
