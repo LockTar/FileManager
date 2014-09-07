@@ -113,14 +113,6 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
         self.IsRootDirectory = ko.observable();
         self.PrefixFull = ko.observable();
         self.Blobs = ko.observableArray();
-        self.NewDirectoryName = ko.observable("").extend({
-            required: true,
-            minLength: 1,
-            pattern: {
-                message: 'Hey this doesnt match my pattern',
-                params: '^[A-Za-z0-9].$'
-            }
-        });
 
         self.Update = function (directory) {
             // Get content of the selected directory
@@ -166,19 +158,6 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
 				});
         }
 
-        self.AddDirectory = function () {
-
-
-            //if (self.NewDirectoryName() !== '') {
-            if (self.isValid()) {
-                GetContainer(self.PrefixFull() + self.NewDirectoryName() + '/', self);
-                self.NewDirectoryName('');
-                self.PageViewModel.DisableAddDirectoryArea();
-            }
-
-            self.PageViewModel.ShowNewDirectoryDialog(false);
-        }
-
         self.Update();
     }
 
@@ -187,6 +166,29 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
         self.Container = container;
 
         ko.mapping.fromJS(data, {}, self);
+    }
+
+    function NewDirectoryViewModel(pageViewModel) {
+        var self = this;
+        self.PageViewModel = pageViewModel;
+
+        self.NewDirectoryName = ko.observable('').extend({
+            required: true,
+            minLength: 1,
+            ////pattern: {
+            ////    message: 'Hey this doesnt match my pattern',
+            ////    params: '^[A-Z0-9]'
+            ////}
+        });
+
+        self.AddDirectory = function () {
+            if (self.isValid()) {
+                GetContainer(self.PageViewModel.containerViewModel.PrefixFull() + self.NewDirectoryName() + '/', self.PageViewModel.containerViewModel);
+                self.PageViewModel.ShowNewDirectoryDialog(false);
+                self.NewDirectoryName('');
+                self.NewDirectoryName.isModified(false);
+            }
+        }
     }
 
     function UploadsViewModel(pageViewModel) {
@@ -278,7 +280,6 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
             self.UploadAreaEnabled = ko.observable(false);
             self.EnableUploadArea = function () {
                 self.UploadAreaEnabled(true);
-                self.DisableAddDirectoryArea();
             }
 
             self.DisableUploadArea = function () {
@@ -288,47 +289,25 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
             self.ToggleUploadArea = function () {
                 if (self.UploadAreaEnabled() === false) {
                     self.EnableUploadArea();
-                    self.DisableAddDirectoryArea();
                 }
                 else {
                     self.DisableUploadArea();
                 }
             }
 
-            self.AddDirectoryAreaEnabled = ko.observable(false);
             self.NewDirectoryNameFocus = ko.observable(false);
 
-            self.EnableAddDirectoryArea = function () {
-                self.DisableUploadArea();
-                self.AddDirectoryAreaEnabled(true);
-                //self.NewDirectoryNameFocus(true);
-            }
-
-            self.DisableAddDirectoryArea = function () {
-                self.AddDirectoryAreaEnabled(false);
-            }
-
-            self.ToggleAddDirectoryArea = function () {
-                if (self.AddDirectoryAreaEnabled() === false) {
-                    self.DisableUploadArea();
-                    self.EnableAddDirectoryArea();
-                }
-                else {
-                    self.DisableAddDirectoryArea();
-                }
-            }
-
             self.uploadsViewModel = new UploadsViewModel(self);
-            //self.containerViewModel = ko.validatedObservable(new ContainerViewModel(containerName, self));
             self.containerViewModel = new ContainerViewModel(containerName, self);
+            self.NewDirectoryViewModel = ko.validatedObservable(new NewDirectoryViewModel(self));
 
             self.IsNewDirectoryDialogShown = ko.observable(false);
-            
+
             self.ShowNewDirectoryDialog = function (show) {
                 self.IsNewDirectoryDialogShown(show);
 
                 window.setTimeout(function () { self.NewDirectoryNameFocus(true); }, 501);
-                
+
             };
         },
 
