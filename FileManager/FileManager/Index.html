@@ -58,7 +58,7 @@
     <div class="container-fluid">
         <div class="row">
             <div id="page-viewmodel" class="col-sm-12 col-sm-offset-0 col-md-12 col-md-offset-0 main">
-                
+
                 <h1>
                     <span data-bind="text: containerViewModel.ContainerName"></span>
                     <button type="button" id="toggleUploadArea" class="header-button" data-bind="click: ToggleUploadArea"><span class="glyphicon glyphicon-upload"></span> Upload files</button>
@@ -80,7 +80,7 @@
                         <div id="upload-liveuploads" data-bind="template: { name: 'template-uploads' }"></div>
                     </div>
                 </div>
-                
+
                 <div class="row" style="margin-top: 20px;">
                     <div class="col-lg-12" data-bind="with: containerViewModel">
                         <div class="input-group">
@@ -107,8 +107,8 @@
                                         <th></th>
                                     </tr>
                                 </thead>
-                                <tbody data-bind="foreach: Blobs">
 
+                                <tbody data-bind="foreach: Blobs">
                                     <!-- ko if: IsDirectory -->
                                     <tr data-bind="click: $parent.Update">
                                         <td></td>
@@ -138,14 +138,13 @@
                                         </td>
                                     </tr>
                                     <!-- /ko -->
-
                                 </tbody>
 
-                                <!--<tbody data-bind="visible: Blobs().length = 0">
-                                    <tr>
+                                <tfoot>
+                                    <tr data-bind="visible: Blobs().length == 0">
                                         <td colspan="4" style="text-align: center;">This directory is empty</td>
                                     </tr>
-                                </tbody>-->
+                                </tfoot>
                             </table>
                         </div>
                     </div>
