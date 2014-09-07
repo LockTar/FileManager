@@ -25,6 +25,33 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
         }
     };
 
+    ko.bindingHandlers.modal = {
+        init: function (element, valueAccessor) {
+            $(element).modal({
+                show: false
+            });
+
+            var value = valueAccessor();
+            if (ko.isObservable(value)) {
+                $(element).on('hide.bs.modal', function () {
+                    value(false);
+                });
+            }
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                $(element).modal("destroy");
+            });
+
+        },
+        update: function (element, valueAccessor) {
+            var value = valueAccessor();
+            if (ko.utils.unwrapObservable(value)) {
+                $(element).modal('show');
+            } else {
+                $(element).modal('hide');
+            }
+        }
+    }
+
     function trimTrailingZeros(number) {
         return number.toFixed(1).replace(/\.0+$/, '');
     }
@@ -88,10 +115,10 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
         self.Blobs = ko.observableArray();
         self.NewDirectoryName = ko.observable("").extend({
             required: true,
-            minLength: 3,
+            minLength: 1,
             pattern: {
                 message: 'Hey this doesnt match my pattern',
-                params: '^[A-Z0-9].$'
+                params: '^[A-Za-z0-9].$'
             }
         });
 
@@ -148,6 +175,8 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
                 self.NewDirectoryName('');
                 self.PageViewModel.DisableAddDirectoryArea();
             }
+
+            self.PageViewModel.ShowNewDirectoryDialog(false);
         }
 
         self.Update();
@@ -272,7 +301,7 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
             self.EnableAddDirectoryArea = function () {
                 self.DisableUploadArea();
                 self.AddDirectoryAreaEnabled(true);
-                self.NewDirectoryNameFocus(true);
+                //self.NewDirectoryNameFocus(true);
             }
 
             self.DisableAddDirectoryArea = function () {
@@ -290,7 +319,17 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'],
             }
 
             self.uploadsViewModel = new UploadsViewModel(self);
-            self.containerViewModel = ko.validatedObservable(new ContainerViewModel(containerName, self));
+            //self.containerViewModel = ko.validatedObservable(new ContainerViewModel(containerName, self));
+            self.containerViewModel = new ContainerViewModel(containerName, self);
+
+            self.IsNewDirectoryDialogShown = ko.observable(false);
+            
+            self.ShowNewDirectoryDialog = function (show) {
+                self.IsNewDirectoryDialogShown(show);
+
+                window.setTimeout(function () { self.NewDirectoryNameFocus(true); }, 501);
+                
+            };
         },
 
         applyBindings: function (model, context) {

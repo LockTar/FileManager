@@ -62,8 +62,8 @@
                 <h1>
                     <span data-bind="text: containerViewModel.ContainerName"></span>
                     <button type="button" id="toggleUploadArea" class="header-button" data-bind="click: ToggleUploadArea"><span class="glyphicon glyphicon-upload"></span> Upload files</button>
-                    <button type="button" id="toggleAddDirectory" class="header-button" data-bind="click: ToggleAddDirectoryArea"><span class="glyphicon glyphicon-plus"></span> New directory</button>
-                </h1>
+                    <button type="button" id="toggleAddDirectory" class="header-button" data-bind="click: function() { ShowNewDirectoryDialog(true); }"><span class="glyphicon glyphicon-plus"></span> New directory</button>
+                </h1><!--data-bind="click: ToggleAddDirectoryArea"-->
 
                 <div class="row" data-bind="fadeVisible: UploadAreaEnabled">
                     <div class="col-sm-12" data-bind="with: uploadsViewModel">
@@ -81,12 +81,11 @@
                     </div>
                 </div>
 
-                <div class="row" data-bind="fadeVisible: AddDirectoryAreaEnabled">
+                <!--<div class="row" data-bind="fadeVisible: AddDirectoryAreaEnabled">
                     <div class="col-sm-12" data-bind="with: containerViewModel">
-                        <input type="text" data-bind="value: NewDirectoryName, hasFocus: $parent.NewDirectoryNameFocus" onkeyup="if (event.keyCode == 13) { document.getElementById('addDirectory').click(); }" />
-                        <button type="button" id="addDirectory" class="btn btn-primary" data-bind="click: AddDirectory">Add</button>
-                    </div><!--, disable: NewDirectoryName() == ''-->
-                </div>
+                        <input type="text" data-bind="value: NewDirectoryName, hasFocus: $parent.NewDirectoryNameFocus" /> <button type="button" id="addDirectory" class="btn btn-primary" data-bind="click: AddDirectory">Add</button>
+                    </div>
+                </div>-->
 
                 <div class="row" style="margin-top: 20px;">
                     <div class="col-lg-12" data-bind="with: containerViewModel">
@@ -157,6 +156,27 @@
                         </div>
                     </div>
                 </div>
+
+
+                <!--Dialog for adding new directory-->
+                <div class="modal fade" tabindex="-1" role="dialog" data-bind="modal: IsNewDirectoryDialogShown">
+                    <div class="modal-dialog">
+                        <div class="modal-content" data-bind="with: containerViewModel">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Add new directory</h4>
+
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" data-bind="value: NewDirectoryName, hasFocus: $parent.NewDirectoryNameFocus" />
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bind="click : AddDirectory">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
 
             </div>
