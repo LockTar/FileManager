@@ -122,16 +122,16 @@
                                     <!-- ko if: IsFile -->
                                     <tr>
                                         <td>
-                                            <button type="button" class="btn btn-default btn-xs" title="Download">
+                                            <a title="Download" class="btn btn-default btn-xs" data-bind="attr: { href: Uri }">
                                                 <span class="glyphicon glyphicon-download"></span>
-                                            </button>
+                                            </a>
                                         </td>
                                         <td data-bind="text: Name"></td>
                                         <td data-bind="text: Uri"></td>
                                         <td style="text-align: right;">
-                                            <button type="button" class="btn btn-warning btn-xs">
+                                            <!--<button type="button" class="btn btn-warning btn-xs">
                                                 <span class="glyphicon glyphicon-pencil"></span> Edit
-                                            </button>
+                                            </button>-->
                                             <button type="button" class="btn btn-danger btn-xs" data-bind="click: $parent.DeleteFile">
                                                 <span class="glyphicon glyphicon-trash"></span> Delete
                                             </button>

@@ -133,7 +133,7 @@ namespace FileManager.Controllers
 					blobs.Add(new BlobItemViewModel()
 					{
 						BlobType = BlobItemType.CloudBlobDirectory,
-						Name = directory.Uri.Segments.Last().Replace("/", ""),
+						Name = System.Net.WebUtility.UrlDecode(directory.Uri.Segments.Last().Replace("/", "")),
 						Uri = directory.Uri.AbsoluteUri,
 						PrefixFull = directory.Prefix,
 						PrefixLast = prefixLast
@@ -492,21 +492,6 @@ namespace FileManager.Controllers
 		{
 			get
 			{
-				//var firstBlob = blobs.FirstOrDefault(b => b.BlobType == FileController.BlobItemType.CloudBlockBlob);
-
-				//string breadCrumb = string.Empty;
-
-				//if (firstBlob == null)
-				//{
-				//	breadCrumb = ContainerName;
-				//}
-				//else
-				//{
-				//	breadCrumb = string.Format("{0}/{1}", ContainerName, firstBlob.PrefixFull);
-				//}
-
-				//return breadCrumb;
-
 				string breadCrumb = string.Format("{0}/{1}", ContainerName, PrefixFull);
 				if (breadCrumb.Last() == '/')
 				{
