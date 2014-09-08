@@ -1,8 +1,14 @@
 ﻿/*jslint browser:true*/
 /*global define*/
 
-define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload, ko, koMap) {
+define(['src/html5Upload', 'knockout', 'knockoutMapper', 'knockout.validation'], function (html5Upload, ko, koMap, validation) {
     'use strict';
+
+    ko.mapping = koMap;
+    ko.validation = validation;
+
+    var validationOptions = { insertMessages: true, decorateElement: true, errorElementClass: 'errorFill' };
+    ko.validation.init(validationOptions);
 
     // Here's a custom Knockout binding that makes elements shown/hidden via jQuery's fadeIn()/fadeOut() methods
     // Could be stored in a separate utility library
@@ -107,7 +113,6 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
         self.IsRootDirectory = ko.observable();
         self.PrefixFull = ko.observable();
         self.Blobs = ko.observableArray();
-        self.NewDirectoryName = ko.observable("");
 
         self.Update = function (directory) {
             // Get content of the selected directory
@@ -153,24 +158,37 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
 				});
         }
 
-        self.AddDirectory = function () {
-            if (self.NewDirectoryName() !== '') {
-                GetContainer(self.PrefixFull() + self.NewDirectoryName() + '/', self);
-                self.NewDirectoryName('');
-                self.PageViewModel.DisableAddDirectoryArea();
-            }
-
-            self.PageViewModel.ShowNewDirectoryDialog(false);
-        }
-
         self.Update();
-    }
+            }
 
     function BlobItemViewModel(data, container) {
         var self = this;
         self.Container = container;
 
-        koMap.fromJS(data, {}, self);
+        ko.mapping.fromJS(data, {}, self);
+    }
+
+    function NewDirectoryViewModel(pageViewModel) {
+        var self = this;
+        self.PageViewModel = pageViewModel;
+
+        self.NewDirectoryName = ko.observable('').extend({
+            required: true,
+            minLength: 1,
+            ////pattern: {
+            ////    message: 'Hey this doesnt match my pattern',
+            ////    params: '^[A-Z0-9]'
+            ////}
+        });
+
+        self.AddDirectory = function () {
+            if (self.isValid()) {
+                GetContainer(self.PageViewModel.containerViewModel.PrefixFull() + self.NewDirectoryName() + '/', self.PageViewModel.containerViewModel);
+                self.PageViewModel.ShowNewDirectoryDialog(false);
+                self.NewDirectoryName('');
+                self.NewDirectoryName.isModified(false);
+            }
+        }
     }
 
     function UploadsViewModel(pageViewModel) {
@@ -262,7 +280,6 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
             self.UploadAreaEnabled = ko.observable(false);
             self.EnableUploadArea = function () {
                 self.UploadAreaEnabled(true);
-                self.DisableAddDirectoryArea();
             }
 
             self.DisableUploadArea = function () {
@@ -272,7 +289,6 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
             self.ToggleUploadArea = function () {
                 if (self.UploadAreaEnabled() === false) {
                     self.EnableUploadArea();
-                    self.DisableAddDirectoryArea();
                 }
                 else {
                     self.DisableUploadArea();
@@ -281,6 +297,7 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
 
             self.uploadsViewModel = new UploadsViewModel(self);
             self.containerViewModel = new ContainerViewModel(containerName, self);
+            self.NewDirectoryViewModel = ko.validatedObservable(new NewDirectoryViewModel(self));
 
             self.NewDirectoryNameFocus = ko.observable(false);
             self.IsNewDirectoryDialogShown = ko.observable(false);
@@ -288,9 +305,9 @@ define(['src/html5Upload', 'knockout', 'knockoutMapper'], function (html5Upload,
             self.ShowNewDirectoryDialog = function (show) {
                 self.IsNewDirectoryDialogShown(show);
 
-                window.setTimeout(function () { self.NewDirectoryNameFocus(true); }, 501);                
+                window.setTimeout(function () { self.NewDirectoryNameFocus(true); }, 501);
             };
-
+                
 
             self.FileToDelete = ko.observable();
             self.IsConfirmDeleteFileDialogShown = ko.observable(false);

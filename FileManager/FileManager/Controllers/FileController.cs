@@ -98,7 +98,7 @@ namespace FileManager.Controllers
 				{
 					CloudBlockBlob blob = (CloudBlockBlob)item;
 					Console.WriteLine("Block blob of length {0}: {1}", blob.Properties.Length, blob.Uri);
-
+					
 					// Get the name and prefix of the blob
 					string blobName = GetBlobName(blob.Name);
 					string prefixFull = GetPrefixFull(blob.Name);
@@ -133,7 +133,7 @@ namespace FileManager.Controllers
 					blobs.Add(new BlobItemViewModel()
 					{
 						BlobType = BlobItemType.CloudBlobDirectory,
-						Name = directory.Uri.Segments.Last().Replace("/", ""),
+						Name = System.Net.WebUtility.UrlDecode(directory.Uri.Segments.Last().Replace("/", "")),
 						Uri = directory.Uri.AbsoluteUri,
 						PrefixFull = directory.Prefix,
 						PrefixLast = prefixLast
@@ -330,8 +330,7 @@ namespace FileManager.Controllers
 			CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 			return blobClient;
 		}
-
-
+		
 		private static string GetPrefixFull(string blobName)
 		{
 			var nameSegments = GetBlobNameSegments(blobName);
@@ -431,6 +430,20 @@ namespace FileManager.Controllers
 			}
 		}
 
+		internal static bool IsImage(string Name)
+		{
+			string extension = Path.GetExtension(Name).ToLower();
+
+			if (extension == ".jpg" || extension == ".gif" || extension == ".png" || extension == ".bmp")
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		private static string[] GetBlobNameSegments(string blobName)
 		{
 			var nameSegments = blobName.Split(new char[] { '/' });
@@ -492,21 +505,6 @@ namespace FileManager.Controllers
 		{
 			get
 			{
-				//var firstBlob = blobs.FirstOrDefault(b => b.BlobType == FileController.BlobItemType.CloudBlockBlob);
-
-				//string breadCrumb = string.Empty;
-
-				//if (firstBlob == null)
-				//{
-				//	breadCrumb = ContainerName;
-				//}
-				//else
-				//{
-				//	breadCrumb = string.Format("{0}/{1}", ContainerName, firstBlob.PrefixFull);
-				//}
-
-				//return breadCrumb;
-
 				string breadCrumb = string.Format("{0}/{1}", ContainerName, PrefixFull);
 				if (breadCrumb.Last() == '/')
 				{
@@ -576,6 +574,22 @@ namespace FileManager.Controllers
 				return BlobType == FileController.BlobItemType.CloudBlockBlob;
 			}
 		}
+
+		public bool IsImage
+		{
+			get
+			{
+				if (IsFile && FileController.IsImage(Name))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+
 	}
 
 	public class CreateContainerViewModel
