@@ -25,7 +25,7 @@
 require.config({
     baseUrl: "/Scripts",
     paths: {
-        "knockout": "knockout-3.2.0.debug",
+        "knockout": "knockout-3.4.0.debug",
         "knockout.validation": "knockout.validation",
         knockoutMapper: 'knockout.mapping-latest.debug'
     },
